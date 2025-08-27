@@ -1,5 +1,7 @@
 #include "loginform.h"
 #include "ui_loginform.h"
+#include "signupform.h"
+
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -57,8 +59,9 @@ void LoginForm::handleLoginClicked()
 
 void LoginForm::handleSignUpClicked()
 {
-    QMessageBox::information(this, "Sign Up", "Sign up clicked! (not implemented yet)");
-    // TODO: send signup request or open signup form
+    // Pass the same socket so client communicates with server on same connection
+    SignUpForm *form = new SignUpForm(socket, this);
+    form->show();
 }
 
 void LoginForm::onReadyRead()

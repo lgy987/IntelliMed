@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>robot.jpeg</file>
+    </qresource>
+    <qresource prefix="/style"/>
+</RCC>

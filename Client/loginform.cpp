@@ -1,6 +1,7 @@
 #include "loginform.h"
 #include "ui_loginform.h"
 #include "signupform.h"
+#include "homepage.h"
 
 #include <QMessageBox>
 #include <QJsonObject>
@@ -77,7 +78,9 @@ void LoginForm::onReadyRead()
             QString status = obj["status"].toString();
             if (status == "ok") {
                 QMessageBox::information(this, "Login", "Login successful!");
-                // TODO: hide login form and open main app window
+                HomePage *home = new HomePage();
+                home->show();
+                this->hide();
             } else {
                 QString msg = obj.value("message").toString("Invalid username or password.");
                 QMessageBox::warning(this, "Login", msg);

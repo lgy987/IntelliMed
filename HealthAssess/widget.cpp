@@ -6,7 +6,7 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    setWindowTitle("问卷收集"); // 设置窗口标题
+    setWindowTitle("健康自测问卷"); // 设置窗口标题
     //connect(ui->pushButton, &QPushButton::clicked, this, &Widget::on_submitButton_clicked);
 }
 

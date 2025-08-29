@@ -13,9 +13,9 @@ SignUpForm::SignUpForm(QWidget *loginForm, NetworkManager *network, QWidget *par
 {
     ui->setupUi(this);
 
-    connect(ui->signUpButton, &QPushButton::clicked, this, &SignUpForm::onSignUpButtonClicked);
-    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &SignUpForm::onShowPasswordToggled);
-    connect(ui->backToLoginButton, &QPushButton::clicked, this, &SignUpForm::onBackToLoginClicked);
+    connect(ui->signUpButton, &QPushButton::clicked, this, &SignUpForm::handleSignUpClicked);
+    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &SignUpForm::handleShowPasswordToggled);
+    connect(ui->backToLoginButton, &QPushButton::clicked, this, &SignUpForm::handleBackToLoginClicked);
     connect(network, &NetworkManager::signUpResponse, this, &SignUpForm::handleSignUpResponse);
 }
 
@@ -24,33 +24,42 @@ SignUpForm::~SignUpForm()
     delete ui;
 }
 
-void SignUpForm::onSignUpButtonClicked()
+void SignUpForm::handleSignUpClicked()
 {
-    network->sendSignUp(
-        ui->usernameEdit->text(),
-        ui->passwordEdit->text(),
-        ui->emailEdit->text()
-        );
+    QString username = ui->usernameEdit->text();
+    QString password = ui->passwordEdit->text();
+    QString email = ui->emailEdit->text();
+
+    if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+        ui->warningLabel->setText("Please enter all fields.");
+        return;
+    } else {
+        ui->warningLabel->clear();
+    }
+
+    network->sendSignUp(username, password, email);
 }
 
 void SignUpForm::handleSignUpResponse(const QJsonObject &obj)
 {
     if (obj["status"].toString() == "ok") {
         QMessageBox::information(this, "Sign Up", obj.value("message").toString("Sign up successful!"));
-        this->close();
+        this->deleteLater();
+        if (loginForm) loginForm->show();
     } else {
-        QMessageBox::warning(this, "Sign Up", obj.value("message").toString("Sign up failed."));
+        QString msg = obj.value("message").toString("Sign up failed.");
+        ui->warningLabel->setText(msg);
     }
 }
 
-void SignUpForm::onShowPasswordToggled(bool checked)
+void SignUpForm::handleShowPasswordToggled(bool checked)
 {
     ui->passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
     ui->confirmPasswordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
 }
 
-void SignUpForm::onBackToLoginClicked()
+void SignUpForm::handleBackToLoginClicked()
 {
     this->deleteLater();
-    if (loginForm) loginForm->show(); // show login form if it exists
+    if (loginForm) loginForm->show();
 }

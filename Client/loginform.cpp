@@ -18,13 +18,7 @@ LoginForm::LoginForm(QWidget *parent)
     connect(network, &NetworkManager::loginResponse, this, &LoginForm::handleLoginResponse);
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginForm::handleLoginClicked);
     connect(ui->signUpButton, &QPushButton::clicked, this, &LoginForm::handleSignUpClicked);
-    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, [this](bool checked){
-        if (checked) {
-            ui->passwordEdit->setEchoMode(QLineEdit::Normal); // show text
-        } else {
-            ui->passwordEdit->setEchoMode(QLineEdit::Password); // hide text
-        }
-    });
+    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &LoginForm::handleShowPasswordToggled);
 
     if (!Session::instance().username().isEmpty()) {
         ui->usernameEdit->setText(Session::instance().username());
@@ -92,4 +86,9 @@ void LoginForm::handleLoginResponse(const QJsonObject &obj)
         QString msg = obj.value("message").toString("Invalid username or password.");
         ui->warningLabel->setText(msg);
     }
+}
+
+void LoginForm::handleShowPasswordToggled(bool checked)
+{
+    ui->passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
 }

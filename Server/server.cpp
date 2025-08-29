@@ -50,6 +50,7 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
         return handleSignUp(request);
     } else {
         QJsonObject reply;
+        reply["action"] = "";
         reply["status"] = "error";
         reply["message"] = "Unknown action";
         return reply;
@@ -71,6 +72,7 @@ QJsonObject Server::handleLogin(const QJsonObject &request) {
         return createSessionForUser(userId, username);
     } else {
         QJsonObject reply;
+        reply["action"] = "login";
         reply["status"] = "error";
         reply["message"] = "Invalid credentials";
         return reply;
@@ -93,6 +95,7 @@ QJsonObject Server::handleTokenLogin(const QJsonObject &request) {
         return createSessionForUser(userId, username); // new token + expiry
     } else {
         QJsonObject reply;
+        reply["action"] = "login";
         reply["status"] = "retry"; // token invalid or expired
         return reply;
     }
@@ -105,22 +108,49 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
     QString email    = request["email"].toString();
 
     QJsonObject reply;
+    reply["action"] = "signup";
     if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
         reply["status"] = "error";
         reply["message"] = "All fields required";
     } else {
-        QSqlQuery query;
-        query.prepare("INSERT INTO users (username, password, email) VALUES (:username, :password, :email)");
-        query.bindValue(":username", username);
-        query.bindValue(":password", password);
-        query.bindValue(":email", email);
+        QSqlQuery checkQuery;
+        checkQuery.prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email");
+        checkQuery.bindValue(":username", username);
+        checkQuery.bindValue(":email", email);
 
-        if (query.exec()) {
+        if (checkQuery.exec() && checkQuery.next()) {
+            int count = checkQuery.value(0).toInt();
+            if (count > 0) {
+                reply["status"] = "error";
+
+                // Determine which field is duplicate
+                QSqlQuery usernameQuery;
+                usernameQuery.prepare("SELECT COUNT(*) FROM users WHERE username = :username");
+                usernameQuery.bindValue(":username", username);
+                usernameQuery.exec();
+                usernameQuery.next();
+                if (usernameQuery.value(0).toInt() > 0) {
+                    reply["message"] = "Username already exists";
+                } else {
+                    reply["message"] = "Email already exists";
+                }
+                return reply;
+            }
+        }
+
+        // If we reach here, both username and email are unique
+        QSqlQuery insertQuery;
+        insertQuery.prepare("INSERT INTO users (username, password, email) VALUES (:username, :password, :email)");
+        insertQuery.bindValue(":username", username);
+        insertQuery.bindValue(":password", password);
+        insertQuery.bindValue(":email", email);
+
+        if (insertQuery.exec()) {
             reply["status"] = "ok";
             reply["message"] = "Signup successful";
         } else {
             reply["status"] = "error";
-            reply["message"] = query.lastError().text();
+            reply["message"] = insertQuery.lastError().text();
         }
     }
     return reply;
@@ -164,6 +194,7 @@ QJsonObject Server::createSessionForUser(const QString &userId, const QString &u
 
     // Prepare reply
     QJsonObject reply;
+    reply["action"] = "login";
     reply["status"] = "ok";
     reply["token"] = token;
     reply["userId"] = userId;

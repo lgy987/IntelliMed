@@ -17,10 +17,10 @@ public:
     ~SignUpForm();
 
 private slots:
-    void onSignUpButtonClicked();
+    void handleSignUpClicked();
     void handleSignUpResponse(const QJsonObject &obj);
-    void onShowPasswordToggled(bool checked);
-    void onBackToLoginClicked();
+    void handleShowPasswordToggled(bool checked);
+    void handleBackToLoginClicked();
 
 private:
     Ui::SignUpForm *ui;

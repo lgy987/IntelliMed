@@ -18,6 +18,7 @@ private slots:
     void handleLoginClicked();
     void handleSignUpClicked();
     void handleLoginResponse(const QJsonObject &obj);
+    void handleShowPasswordToggled(bool checked);
 
 private:
     Ui::LoginForm *ui;

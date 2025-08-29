@@ -41,14 +41,6 @@ void NetworkManager::sendTokenLogin(const QString &username, const QString &toke
 
 void NetworkManager::sendSignUp(const QString &username, const QString &password, const QString &email)
 {
-    if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
-        QJsonObject obj;
-        obj["status"] = "error";
-        obj["message"] = "Please fill all fields.";
-        emit signUpResponse(obj);
-        return;
-    }
-
     QJsonObject req;
     req["action"]   = "signup";
     req["username"] = username;
@@ -71,7 +63,7 @@ void NetworkManager::onReadyRead()
         QString action = obj.value("action").toString();
         if (action == "signup") {
             emit signUpResponse(obj);
-        } else {
+        } else if (action == "login") {
             emit loginResponse(obj);
         }
     }

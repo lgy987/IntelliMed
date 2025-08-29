@@ -2,6 +2,7 @@
 #include "server.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QDebug>
 
 bool initDatabase() {
@@ -19,8 +20,9 @@ bool initDatabase() {
                     "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "username TEXT UNIQUE,"
                     "password TEXT,"
-                    "email TEXT UNIQUE)")) {
-        qCritical() << "Failed to create users table:...";
+                    "email TEXT UNIQUE,"
+                    "token TEXT)")) {
+        qCritical() << "Failed to create users table:" << query.lastError();
         return false;
     }
 

@@ -12,11 +12,13 @@ class HomePage : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit HomePage(QWidget *parent = nullptr);
+    explicit HomePage(QWidget *loginForm, QWidget *parent = nullptr);
     ~HomePage();
+    void handleLogout();
 
 private:
     Ui::HomePage *ui;
+    QWidget *loginForm;
 };
 
 #endif // HOMEPAGE_H

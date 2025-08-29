@@ -15,16 +15,8 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_main">
-
-    <!-- Header -->
     <item>
      <widget class="QLabel" name="labelHeader">
-      <property name="text">
-       <string>🏥 医疗管理系统 - 首页</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
       <property name="styleSheet">
        <string notr="true">
         font-size: 22px;
@@ -36,14 +28,16 @@
         border-radius: 8px;
        </string>
       </property>
+      <property name="text">
+       <string>🏥 医疗管理系统 - 首页</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
      </widget>
     </item>
-
-    <!-- Content -->
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_content">
-
-      <!-- Left Navigation -->
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_nav">
         <item>
@@ -81,18 +75,17 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="btnLogout">
+          <property name="text">
+           <string>登出</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
-
-      <!-- Center Area -->
       <item>
        <widget class="QLabel" name="labelWelcome">
-        <property name="text">
-         <string>欢迎使用医疗管理系统！</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
         <property name="styleSheet">
          <string notr="true">
           font-size: 18px;
@@ -100,15 +93,28 @@
           padding: 30px;
          </string>
         </property>
+        <property name="text">
+         <string>欢迎使用医疗管理系统！</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
        </widget>
       </item>
-
      </layout>
     </item>
-
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>900</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>

@@ -129,6 +129,26 @@
        </widget>
       </item>
 
+      <item>
+       <widget class="QLabel" name="warningLabel">
+        <property name="text">
+         <string></string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeft | Qt::AlignVCenter</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+            color: red;
+            font-size: 12px;
+            margin: 0px;
+            padding: 0px;
+         </string>
+        </property>
+       </widget>
+      </item>
+
+
       <!-- Username -->
       <item>
        <widget class="QLineEdit" name="usernameEdit">
@@ -168,6 +188,15 @@
         <property name="alignment">
          <set>Qt::AlignRight</set>
         </property>
+        <property name="styleSheet">
+           <string notr="true">
+            margin: 0px;
+            margin-bottom: 20px;
+            padding: 0px;
+            color: #3b82f6;
+            font-size: 12px;
+           </string>
+          </property>
        </widget>
       </item>
 

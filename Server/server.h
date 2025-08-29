@@ -15,6 +15,12 @@ protected:
 private slots:
     void onReadyRead();
     void onDisconnected();
+    QJsonObject handleAction(const QJsonObject &request);
+    QJsonObject handleLogin(const QJsonObject &request);
+    QJsonObject handleTokenLogin(const QJsonObject &request);
+    QJsonObject handleSignUp(const QJsonObject &request);
+    void sendResponse(QTcpSocket *client, const QJsonObject &reply);
+    QString generateToken();
 
 private:
     QList<QTcpSocket*> clients;

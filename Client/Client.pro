@@ -12,11 +12,15 @@ SOURCES += \
     homepage.cpp \
     main.cpp \
     loginform.cpp \
+    networkmanager.cpp \
+    session.cpp \
     signupform.cpp
 
 HEADERS += \
     homepage.h \
     loginform.h \
+    networkmanager.h \
+    session.h \
     signupform.h
 
 FORMS += \

@@ -2,11 +2,9 @@
 #define LOGINFORM_H
 
 #include <QWidget>
-#include <QTcpSocket>
+#include "networkmanager.h"
 
-QT_BEGIN_NAMESPACE
 namespace Ui { class LoginForm; }
-QT_END_NAMESPACE
 
 class LoginForm : public QWidget
 {
@@ -19,11 +17,11 @@ public:
 private slots:
     void handleLoginClicked();
     void handleSignUpClicked();
-    void onReadyRead();
+    void handleLoginResponse(const QJsonObject &obj);
 
 private:
     Ui::LoginForm *ui;
-    QTcpSocket *socket;
+    NetworkManager *network;
 };
 
-#endif
+#endif // LOGINFORM_H

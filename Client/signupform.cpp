@@ -1,18 +1,22 @@
 #include "signupform.h"
 #include "ui_signupform.h"
+#include "networkmanager.h"
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QJsonDocument>
 
-SignUpForm::SignUpForm(QTcpSocket *socket, QWidget *parent) :
+SignUpForm::SignUpForm(QWidget *loginForm, NetworkManager *network, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SignUpForm),
-    socket(socket)
+    loginForm(loginForm),
+    network(network)
 {
     ui->setupUi(this);
 
-    connect(ui->signUpButton, &QPushButton::clicked, this, &SignUpForm::on_signUpButton_clicked);
-    connect(socket, &QTcpSocket::readyRead, this, &SignUpForm::onReadyRead);
+    connect(ui->signUpButton, &QPushButton::clicked, this, &SignUpForm::onSignUpButtonClicked);
+    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &SignUpForm::onShowPasswordToggled);
+    connect(ui->backToLoginButton, &QPushButton::clicked, this, &SignUpForm::onBackToLoginClicked);
+    connect(network, &NetworkManager::signUpResponse, this, &SignUpForm::handleSignUpResponse);
 }
 
 SignUpForm::~SignUpForm()
@@ -20,46 +24,33 @@ SignUpForm::~SignUpForm()
     delete ui;
 }
 
-void SignUpForm::on_signUpButton_clicked()
+void SignUpForm::onSignUpButtonClicked()
 {
-    QString username = ui->usernameEdit->text();
-    QString password = ui->passwordEdit->text();
-    QString email    = ui->emailEdit->text();
-
-    if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
-        QMessageBox::warning(this, "Error", "Please fill all fields.");
-        return;
-    }
-
-    // JSON signup request
-    QJsonObject req;
-    req["action"]   = "signup";
-    req["username"] = username;
-    req["password"] = password;
-    req["email"]    = email;
-
-    QJsonDocument doc(req);
-    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+    network->sendSignUp(
+        ui->usernameEdit->text(),
+        ui->passwordEdit->text(),
+        ui->emailEdit->text()
+        );
 }
 
-void SignUpForm::onReadyRead()
+void SignUpForm::handleSignUpResponse(const QJsonObject &obj)
 {
-    while (socket->canReadLine()) {
-        QByteArray line = socket->readLine().trimmed();
-        QJsonDocument doc = QJsonDocument::fromJson(line);
-
-        if (!doc.isObject()) continue;
-        QJsonObject obj = doc.object();
-
-        if (obj.contains("status")) {
-            QString status = obj["status"].toString();
-            if (status == "ok") {
-                QMessageBox::information(this, "Sign Up", obj.value("message").toString("Sign up successful!"));
-                this->close();
-            } else {
-                QString msg = obj.value("message").toString("Sign up failed.");
-                QMessageBox::warning(this, "Sign Up", msg);
-            }
-        }
+    if (obj["status"].toString() == "ok") {
+        QMessageBox::information(this, "Sign Up", obj.value("message").toString("Sign up successful!"));
+        this->close();
+    } else {
+        QMessageBox::warning(this, "Sign Up", obj.value("message").toString("Sign up failed."));
     }
+}
+
+void SignUpForm::onShowPasswordToggled(bool checked)
+{
+    ui->passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
+    ui->confirmPasswordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
+}
+
+void SignUpForm::onBackToLoginClicked()
+{
+    this->deleteLater();
+    if (loginForm) loginForm->show(); // show login form if it exists
 }

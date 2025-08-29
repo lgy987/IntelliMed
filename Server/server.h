@@ -20,6 +20,7 @@ private slots:
     QJsonObject handleTokenLogin(const QJsonObject &request);
     QJsonObject handleSignUp(const QJsonObject &request);
     void sendResponse(QTcpSocket *client, const QJsonObject &reply);
+    QJsonObject createSessionForUser(const QString &userId, const QString &username);
     QString generateToken();
 
 private:

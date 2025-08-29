@@ -2,7 +2,7 @@
 #define SIGNUPFORM_H
 
 #include <QWidget>
-#include <QTcpSocket>
+#include "networkmanager.h"
 
 namespace Ui {
 class SignUpForm;
@@ -13,16 +13,19 @@ class SignUpForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit SignUpForm(QTcpSocket *socket, QWidget *parent = nullptr);
+    explicit SignUpForm(QWidget *loginForm, NetworkManager *network, QWidget *parent = nullptr);
     ~SignUpForm();
 
 private slots:
-    void on_signUpButton_clicked();
-    void onReadyRead();
+    void onSignUpButtonClicked();
+    void handleSignUpResponse(const QJsonObject &obj);
+    void onShowPasswordToggled(bool checked);
+    void onBackToLoginClicked();
 
 private:
     Ui::SignUpForm *ui;
-    QTcpSocket *socket; // Use the same socket as login form
+    QWidget *loginForm;
+    NetworkManager *network;
 };
 
 #endif // SIGNUPFORM_H

@@ -64,62 +64,38 @@ QJsonObject Server::handleLogin(const QJsonObject &request) {
     QSqlQuery query;
     query.prepare("SELECT * FROM users WHERE username = :username AND password = :password");
     query.bindValue(":username", username);
-    query.bindValue(":password", password); // TODO: hash in production
+    query.bindValue(":password", password);
 
-    QJsonObject reply;
     if (query.exec() && query.next()) {
-        QString token = generateToken();
-        QString userId   = query.value("id").toString();
-
-        QSqlQuery update;
-        update.prepare("UPDATE users SET token = :token WHERE id = :id");
-        update.bindValue(":token", token);
-        update.bindValue(":id", userId.toInt());
-        update.exec();
-
-        reply["status"] = "ok";
-        reply["token"] = token;
-        reply["userId"] = query.value("id").toString();
-        reply["username"] = username;
+        QString userId = query.value("id").toString();
+        return createSessionForUser(userId, username);
     } else {
+        QJsonObject reply;
         reply["status"] = "error";
         reply["message"] = "Invalid credentials";
+        return reply;
     }
-    return reply;
 }
 
 // Handle token-based login
 QJsonObject Server::handleTokenLogin(const QJsonObject &request) {
     QString token = request["token"].toString();
+
     QSqlQuery query;
-    QJsonObject reply;
+    query.prepare("SELECT * FROM users WHERE token = :token AND token_expiry > :now");
+    query.bindValue(":token", token);
+    query.bindValue(":now", QDateTime::currentSecsSinceEpoch());
 
-    if (token.isEmpty()) {
-        reply["status"] = "retry";
+    if (query.exec() && query.next()) {
+        // Token valid, renew it
+        QString userId = query.value("id").toString();
+        QString username = query.value("username").toString();
+        return createSessionForUser(userId, username); // new token + expiry
     } else {
-        query.prepare("SELECT * FROM users WHERE token = :token");
-        query.bindValue(":token", token);
-
-        if (query.exec() && query.next()) {
-            QString token = generateToken();
-            QString username = query.value("username").toString();
-            QString userId   = query.value("id").toString();
-
-            QSqlQuery update;
-            update.prepare("UPDATE users SET token = :token WHERE id = :id");
-            update.bindValue(":token", token);
-            update.bindValue(":id", userId.toInt());
-            update.exec();
-
-            reply["status"] = "ok";
-            reply["token"] = token;
-            reply["userId"] = query.value("id").toString();
-            reply["username"] = query.value("username").toString();
-        } else {
-            reply["status"] = "retry";
-        }
+        QJsonObject reply;
+        reply["status"] = "retry"; // token invalid or expired
+        return reply;
     }
-    return reply;
 }
 
 // Handle user signup
@@ -163,6 +139,37 @@ void Server::onDisconnected() {
         client->deleteLater();
         qDebug() << "Client disconnected.";
     }
+}
+
+QJsonObject Server::createSessionForUser(const QString &userId, const QString &username) {
+    // Generate token
+    QString token = generateToken();
+
+    // Optional: set token expiry (e.g., 1 hour from now)
+    qint64 now = QDateTime::currentSecsSinceEpoch();
+    qint64 duration = 24 * 3600; // 1 day
+    qint64 expiry = now + duration;
+
+    // Update database
+    QSqlQuery update;
+    update.prepare("UPDATE users SET token = :token, token_expiry = :expiry WHERE id = :id");
+    update.bindValue(":token", token);
+    update.bindValue(":expiry", static_cast<qint64>(expiry));
+    update.bindValue(":id", userId.toInt());
+    update.exec();
+
+    if (!update.exec()) {
+        qWarning() << "Failed to update token:" << update.lastError().text();
+    }
+
+    // Prepare reply
+    QJsonObject reply;
+    reply["status"] = "ok";
+    reply["token"] = token;
+    reply["userId"] = userId;
+    reply["username"] = username;
+
+    return reply;
 }
 
 QString Server::generateToken() {

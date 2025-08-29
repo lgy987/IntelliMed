@@ -21,7 +21,8 @@ bool initDatabase() {
                     "username TEXT UNIQUE,"
                     "password TEXT,"
                     "email TEXT UNIQUE,"
-                    "token TEXT)")) {
+                    "token TEXT,"
+                    "token_expiry INTEGER)")) {
         qCritical() << "Failed to create users table:" << query.lastError();
         return false;
     }

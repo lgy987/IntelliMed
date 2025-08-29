@@ -60,6 +60,9 @@
             font-size: 15px;
             font-weight: bold;
         }
+        QLineEdit, QCheckBox {
+            color: black;
+        }
         #loginButton {
             background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                                              stop:0 #3b82f6, stop:1 #2563eb);
@@ -81,7 +84,7 @@
         }
         #forgotPasswordLabel:hover {
             text-decoration: underline;
-        }
+        }        
       </string>
      </property>
 
@@ -129,6 +132,7 @@
        </widget>
       </item>
 
+      <!-- WarningLabel -->
       <item>
        <widget class="QLabel" name="warningLabel">
         <property name="text">
@@ -147,7 +151,6 @@
         </property>
        </widget>
       </item>
-
 
       <!-- Username -->
       <item>

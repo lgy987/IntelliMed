@@ -39,6 +39,26 @@ void NetworkManager::sendTokenLogin(const QString &username, const QString &toke
     socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
 }
 
+void NetworkManager::sendSignUp(const QString &username, const QString &password, const QString &email)
+{
+    if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+        QJsonObject obj;
+        obj["status"] = "error";
+        obj["message"] = "Please fill all fields.";
+        emit signUpResponse(obj);
+        return;
+    }
+
+    QJsonObject req;
+    req["action"]   = "signup";
+    req["username"] = username;
+    req["password"] = password;
+    req["email"]    = email;
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
 void NetworkManager::onReadyRead()
 {
     while (socket->canReadLine()) {
@@ -47,6 +67,12 @@ void NetworkManager::onReadyRead()
 
         if (!doc.isObject()) continue;
         QJsonObject obj = doc.object();
-        emit loginResponse(obj);
+
+        QString action = obj.value("action").toString();
+        if (action == "signup") {
+            emit signUpResponse(obj);
+        } else {
+            emit loginResponse(obj);
+        }
     }
 }

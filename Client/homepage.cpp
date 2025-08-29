@@ -27,5 +27,5 @@ void HomePage::handleLogout()
         loginForm->show();
     }
 
-    this->close();  // close homepage
+    this->deleteLater();
 }

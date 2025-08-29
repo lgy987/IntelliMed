@@ -18,6 +18,13 @@ LoginForm::LoginForm(QWidget *parent)
     connect(network, &NetworkManager::loginResponse, this, &LoginForm::handleLoginResponse);
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginForm::handleLoginClicked);
     connect(ui->signUpButton, &QPushButton::clicked, this, &LoginForm::handleSignUpClicked);
+    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, [this](bool checked){
+        if (checked) {
+            ui->passwordEdit->setEchoMode(QLineEdit::Normal); // show text
+        } else {
+            ui->passwordEdit->setEchoMode(QLineEdit::Password); // hide text
+        }
+    });
 
     if (!Session::instance().username().isEmpty()) {
         ui->usernameEdit->setText(Session::instance().username());
@@ -52,7 +59,7 @@ void LoginForm::handleLoginClicked()
 
 void LoginForm::handleSignUpClicked()
 {
-    SignUpForm *form = new SignUpForm(nullptr);
+    SignUpForm *form = new SignUpForm(this, this->network);
     form->show();
     this->hide();
 }

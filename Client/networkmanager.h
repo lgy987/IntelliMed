@@ -13,11 +13,14 @@ public:
     ~NetworkManager();
 
     void connectToServer(const QString &host = "127.0.0.1", quint16 port = 12345);
+
     void sendLogin(const QString &username, const QString &password, bool remember);
     void sendTokenLogin(const QString &username, const QString &token);
+    void sendSignUp(const QString &username, const QString &password, const QString &email);
 
 signals:
-    void loginResponse(const QJsonObject &response);
+    void loginResponse(const QJsonObject &obj);
+    void signUpResponse(const QJsonObject &obj);
 
 private slots:
     void onReadyRead();

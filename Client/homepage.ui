@@ -6,85 +6,109 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>900</width>
     <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Home Page</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>70</y>
-      <width>58</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>主页</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>100</y>
-      <width>102</width>
-      <height>168</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>用户管理</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_5">
-       <property name="text">
-        <string>挂号预约</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>病例管理</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>医嘱管理</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="text">
-        <string>健康评估</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout_main">
+
+    <!-- Header -->
+    <item>
+     <widget class="QLabel" name="labelHeader">
+      <property name="text">
+       <string>🏥 医疗管理系统 - 首页</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">
+        font-size: 22px;
+        font-weight: bold;
+        color: white;
+        background-color: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+                                          stop:0 #2193b0, stop:1 #6dd5ed);
+        padding: 15px;
+        border-radius: 8px;
+       </string>
+      </property>
+     </widget>
+    </item>
+
+    <!-- Content -->
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_content">
+
+      <!-- Left Navigation -->
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_nav">
+        <item>
+         <widget class="QPushButton" name="btnUser">
+          <property name="text">
+           <string>👤 用户管理</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAppointment">
+          <property name="text">
+           <string>📅 挂号预约</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnCases">
+          <property name="text">
+           <string>📄 病例管理</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnOrders">
+          <property name="text">
+           <string>💊 医嘱管理</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnHealth">
+          <property name="text">
+           <string>❤️ 健康评估</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+
+      <!-- Center Area -->
+      <item>
+       <widget class="QLabel" name="labelWelcome">
+        <property name="text">
+         <string>欢迎使用医疗管理系统！</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+          font-size: 18px;
+          color: #333;
+          padding: 30px;
+         </string>
+        </property>
+       </widget>
+      </item>
+
+     </layout>
+    </item>
+
+   </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QMenuBar" name="menubar"/>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>

@@ -6,135 +6,166 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>348</width>
-    <height>411</height>
+    <width>380</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Sign Up</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+
    <item>
     <spacer name="verticalSpacer_top">
      <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
+
+   <!-- Card Frame -->
    <item>
-    <widget class="QFrame" name="SignUpFrame">
+    <widget class="QFrame" name="signUpFrame">
      <property name="styleSheet">
       <string notr="true">
         QFrame {
             background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
         }
         QLabel {
             font-size: 14px;
+            color: #374151;
         }
         QLineEdit {
-            border: 1px solid #cccccc;
-            border-radius: 6px;
-            padding: 6px;
-            font-size: 14px;
-        }
-        QPushButton {
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
             padding: 8px;
             font-size: 14px;
+            background: #f9fafb;
         }
-        QPushButton:hover {
-            background-color: #2563eb;
+        QLineEdit:focus {
+            border: 1px solid #3b82f6;
+            background: #ffffff;
+        }
+        QPushButton {
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: bold;
         }
         #signUpButton {
-            background-color: #e5e7eb;
-            color: #111827;
+            background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                             stop:0 #3b82f6, stop:1 #2563eb);
+            color: white;
         }
         #signUpButton:hover {
-            background-color: #d1d5db;
+            background-color: #1d4ed8;
+        }
+        #backToLoginButton {
+            background: #e5e7eb;
+            color: #111827;
+        }
+        #backToLoginButton:hover {
+            background: #d1d5db;
         }
       </string>
      </property>
-     <layout class="QVBoxLayout" name="formLayout">
+
+     <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0">
+
+      <!-- Avatar -->
       <item>
-       <widget class="QLabel" name="titleLabel">
-        <property name="styleSheet">
-         <string notr="true">font-size:20px; font-weight:bold; margin-bottom:10px;</string>
+       <widget class="QLabel" name="avatarLabel">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>80</height>
+         </size>
         </property>
-        <property name="text">
-         <string>Sign Up</string>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>80</height>
+         </size>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+            background: #e5e7eb;
+            border-radius: 40px;
+         </string>
         </property>
        </widget>
       </item>
+
+      <!-- Title -->
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_username">
-        <item>
-         <widget class="QLabel" name="usernameLabel">
-          <property name="text">
-           <string>Username</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="usernameEdit">
-          <property name="placeholderText">
-           <string>Enter your username</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QLabel" name="titleLabel">
+        <property name="styleSheet">
+         <string notr="true">font-size:22px; font-weight:bold; margin:10px 0;</string>
+        </property>
+        <property name="text">
+         <string>Create Account</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </item>
+
+      <!-- Username -->
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_password">
-        <item>
-         <widget class="QLabel" name="passwordLabel">
-          <property name="text">
-           <string>Password</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="passwordEdit">
-          <property name="echoMode">
-           <enum>QLineEdit::EchoMode::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your password</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QLineEdit" name="usernameEdit">
+        <property name="placeholderText">
+         <string>Username</string>
+        </property>
+       </widget>
       </item>
+
+      <!-- Email -->
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_email">
-        <item>
-         <widget class="QLabel" name="emailLabel">
-          <property name="text">
-           <string>Email</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="emailEdit">
-          <property name="placeholderText">
-           <string>Enter your email</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QLineEdit" name="emailEdit">
+        <property name="placeholderText">
+         <string>Email</string>
+        </property>
+       </widget>
       </item>
+
+      <!-- Password -->
+      <item>
+       <widget class="QLineEdit" name="passwordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Password</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Confirm Password -->
+      <item>
+       <widget class="QLineEdit" name="confirmPasswordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Confirm Password</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Buttons -->
       <item>
        <widget class="QPushButton" name="signUpButton">
         <property name="text">
@@ -142,13 +173,21 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="backToLoginButton">
+        <property name="text">
+         <string>Back to Login</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
+
    <item>
     <spacer name="verticalSpacer_bottom">
      <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -158,6 +197,7 @@
      </property>
     </spacer>
    </item>
+
   </layout>
  </widget>
  <resources/>

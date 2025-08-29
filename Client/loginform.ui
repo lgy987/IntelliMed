@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>348</width>
-    <height>411</height>
+    <width>380</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,106 +17,161 @@
    <item>
     <spacer name="verticalSpacer_top">
      <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
+
+   <!-- Card Frame -->
    <item>
     <widget class="QFrame" name="loginFrame">
      <property name="styleSheet">
       <string notr="true">
         QFrame {
             background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
         }
         QLabel {
             font-size: 14px;
+            color: #374151;
         }
         QLineEdit {
-            border: 1px solid #cccccc;
-            border-radius: 6px;
-            padding: 6px;
-            font-size: 14px;
-        }
-        QPushButton {
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
             padding: 8px;
             font-size: 14px;
+            background: #f9fafb;
         }
-        QPushButton:hover {
-            background-color: #2563eb;
+        QLineEdit:focus {
+            border: 1px solid #3b82f6;
+            background: #ffffff;
+        }
+        QPushButton {
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        #loginButton {
+            background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                             stop:0 #3b82f6, stop:1 #2563eb);
+            color: white;
+        }
+        #loginButton:hover {
+            background-color: #1d4ed8;
         }
         #signUpButton {
-            background-color: #e5e7eb;
+            background: #e5e7eb;
             color: #111827;
         }
         #signUpButton:hover {
-            background-color: #d1d5db;
+            background: #d1d5db;
+        }
+        #forgotPasswordLabel {
+            color: #3b82f6;
+            font-size: 12px;
+        }
+        #forgotPasswordLabel:hover {
+            text-decoration: underline;
         }
       </string>
      </property>
-     <layout class="QVBoxLayout" name="formLayout">
+
+     <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0,0,0,0">
+
+      <!-- Avatar -->
+      <item>
+       <widget class="QLabel" name="avatarLabel">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+            background: #e5e7eb;
+            border-radius: 40px;
+         </string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Title -->
       <item>
        <widget class="QLabel" name="titleLabel">
         <property name="styleSheet">
-         <string notr="true">font-size:20px; font-weight:bold; margin-bottom:10px;</string>
+         <string notr="true">font-size:22px; font-weight:bold; margin:10px 0;</string>
         </property>
         <property name="text">
          <string>Welcome Back</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
+
+      <!-- Username -->
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="usernameLabel">
-          <property name="text">
-           <string>Username</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="usernameEdit">
-          <property name="placeholderText">
-           <string>Enter your username</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QLineEdit" name="usernameEdit">
+        <property name="placeholderText">
+         <string>Username</string>
+        </property>
+       </widget>
       </item>
+
+      <!-- Password -->
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="passwordLabel">
-          <property name="text">
-           <string>Password</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="passwordEdit">
-          <property name="echoMode">
-           <enum>QLineEdit::EchoMode::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your password</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QLineEdit" name="passwordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Password</string>
+        </property>
+       </widget>
       </item>
+
+      <!-- Show password -->
+      <item>
+       <widget class="QCheckBox" name="showPasswordCheckBox">
+        <property name="text">
+         <string>Show Password</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Forgot password -->
+      <item>
+       <widget class="QLabel" name="forgotPasswordLabel">
+        <property name="text">
+         <string>Forgot Password?</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight</set>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Remember me -->
       <item>
        <widget class="QCheckBox" name="rememberCheckBox">
         <property name="text">
@@ -124,6 +179,8 @@
         </property>
        </widget>
       </item>
+
+      <!-- Buttons -->
       <item>
        <widget class="QPushButton" name="loginButton">
         <property name="text">
@@ -141,10 +198,11 @@
      </layout>
     </widget>
    </item>
+
    <item>
     <spacer name="verticalSpacer_bottom">
      <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>

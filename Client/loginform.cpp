@@ -14,10 +14,8 @@ LoginForm::LoginForm(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Connect socket signal
     connect(socket, &QTcpSocket::readyRead, this, &LoginForm::onReadyRead);
 
-    // Connect buttons (Qt Designer will also auto-connect if names match)
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginForm::handleLoginClicked);
     connect(ui->signUpButton, &QPushButton::clicked, this, &LoginForm::handleSignUpClicked);
 
@@ -61,8 +59,9 @@ void LoginForm::handleLoginClicked()
 void LoginForm::handleSignUpClicked()
 {
     // Pass the same socket so client communicates with server on same connection
-    SignUpForm *form = new SignUpForm(socket, this);
+    SignUpForm *form = new SignUpForm(socket, nullptr);
     form->show();
+    this->hide();
 }
 
 void LoginForm::onReadyRead()

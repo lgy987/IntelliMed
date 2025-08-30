@@ -115,7 +115,7 @@ bool SignUpForm::checkAllFields(){
     QString password = ui->passwordEdit->text();
     QString confirmPassword = ui->confirmPasswordEdit->text();
     if(username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()){
-        ui->warningLabel->setText("请填写所有输入项");
+        ui->warningLabel->setText("请填写所有项目");
         return false;
     }
     if(!isValidEmail(email)){

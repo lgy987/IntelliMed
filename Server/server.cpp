@@ -52,7 +52,7 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
         QJsonObject reply;
         reply["action"] = "";
         reply["status"] = "error";
-        reply["message"] = "Unknown action";
+        reply["message"] = "未知操作";
         return reply;
     }
 }
@@ -74,7 +74,7 @@ QJsonObject Server::handleLogin(const QJsonObject &request) {
         QJsonObject reply;
         reply["action"] = "login";
         reply["status"] = "error";
-        reply["message"] = "Invalid credentials";
+        reply["message"] = "登录信息无效";
         return reply;
     }
 }
@@ -92,11 +92,11 @@ QJsonObject Server::handleTokenLogin(const QJsonObject &request) {
         // Token valid, renew it
         QString userId = query.value("id").toString();
         QString username = query.value("username").toString();
-        return createSessionForUser(userId, username); // new token + expiry
+        return createSessionForUser(userId, username);
     } else {
         QJsonObject reply;
         reply["action"] = "login";
-        reply["status"] = "retry"; // token invalid or expired
+        reply["status"] = "retry";
         return reply;
     }
 }
@@ -111,7 +111,7 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
     reply["action"] = "signup";
     if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
         reply["status"] = "error";
-        reply["message"] = "All fields required";
+        reply["message"] = "所有字段均为必填项";
     } else {
         QSqlQuery checkQuery;
         checkQuery.prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email");
@@ -130,9 +130,9 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
                 usernameQuery.exec();
                 usernameQuery.next();
                 if (usernameQuery.value(0).toInt() > 0) {
-                    reply["message"] = "Username already exists";
+                    reply["message"] = "用户名已存在";
                 } else {
-                    reply["message"] = "Email already exists";
+                    reply["message"] = "邮箱已存在";
                 }
                 return reply;
             }
@@ -147,7 +147,7 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
 
         if (insertQuery.exec()) {
             reply["status"] = "ok";
-            reply["message"] = "Signup successful";
+            reply["message"] = "注册成功";
         } else {
             reply["status"] = "error";
             reply["message"] = insertQuery.lastError().text();

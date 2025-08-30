@@ -5,6 +5,8 @@
 #include "session.h"
 
 #include <QMessageBox>
+#include <QPainter>
+#include <QPainterPath>
 
 LoginForm::LoginForm(QWidget *parent)
     : QWidget(parent)

@@ -21,6 +21,11 @@ private slots:
     void handleSignUpResponse(const QJsonObject &obj);
     void handleShowPasswordToggled(bool checked);
     void handleBackToLoginClicked();
+    void checkPasswordLength();
+    void checkConfirmPassword();
+    void checkEmail();
+    bool checkAllFields();
+    bool isValidEmail(const QString &email);
 
 private:
     Ui::SignUpForm *ui;

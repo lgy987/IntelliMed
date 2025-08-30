@@ -6,11 +6,10 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-SignUpForm::SignUpForm(QWidget *loginForm, NetworkManager *network, QWidget *parent) :
+SignUpForm::SignUpForm(QWidget *loginForm, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SignUpForm),
-    loginForm(loginForm),
-    network(network)
+    loginForm(loginForm)
 {
     ui->setupUi(this);
     LoginForm::setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
@@ -25,7 +24,7 @@ SignUpForm::SignUpForm(QWidget *loginForm, NetworkManager *network, QWidget *par
     connect(ui->confirmPasswordEdit, &QLineEdit::editingFinished, this, &SignUpForm::checkConfirmPassword);
     connect(ui->emailEdit, &QLineEdit::editingFinished, this, &SignUpForm::checkEmail);
 
-    connect(network, &NetworkManager::signUpResponse, this, &SignUpForm::handleSignUpResponse);
+    connect(&NetworkManager::instance(), &NetworkManager::signUpResponse, this, &SignUpForm::handleSignUpResponse);
 }
 
 SignUpForm::~SignUpForm()
@@ -40,7 +39,7 @@ void SignUpForm::handleSignUpClicked()
         QString password = ui->passwordEdit->text();
         QString email = ui->emailEdit->text();
 
-        network->sendSignUp(username, password, email);
+        NetworkManager::instance().sendSignUp(username, password, email);
     }
 }
 
@@ -124,9 +123,11 @@ bool SignUpForm::checkAllFields(){
     }
     if (password.length() < 8) {
         ui->warningLabel->setText("密码长度至少为 8 个字符");
+        return false;
     }
     if (password != confirmPassword) {
         ui->warningLabel->setText("两次输入的密码不一致");
+        return false;
     }
     return true;
 }

@@ -27,6 +27,16 @@ bool initDatabase() {
         return false;
     }
 
+    if (!query.exec("CREATE TABLE IF NOT EXISTS personal_info ("
+                    "id INTEGER PRIMARY KEY,"               // same as users.id
+                    "name TEXT,"                    // real name
+                    "id_number TEXT,"               // ID number
+                    "phone_number TEXT,"                     // optional phone number, nullable
+                    "FOREIGN KEY(id) REFERENCES users(id) ON DELETE CASCADE)")) {
+        qCritical() << "Failed to create personal_info table:" << query.lastError();
+        return false;
+    }
+
     return true;
 }
 

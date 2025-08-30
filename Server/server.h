@@ -16,13 +16,16 @@ private slots:
     void onReadyRead();
     void onDisconnected();
     QJsonObject handleAction(const QJsonObject &request);
+
+private:
+    QList<QTcpSocket*> clients;
     QJsonObject handleLogin(const QJsonObject &request);
     QJsonObject handleTokenLogin(const QJsonObject &request);
     QJsonObject handleSignUp(const QJsonObject &request);
     void sendResponse(QTcpSocket *client, const QJsonObject &reply);
-    QJsonObject createSessionForUser(const QString &userId, const QString &username);
+    QJsonObject createSessionForUser(const int &userId, const QString &username);
     QString generateToken();
-
-private:
-    QList<QTcpSocket*> clients;
+    QJsonObject handleGetPersonalInfo(const QJsonObject &request);
+    QJsonObject handleUpdatePersonalInfo(const QJsonObject &request);
+    int checkToken(const QString &token);
 };

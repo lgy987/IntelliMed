@@ -3,6 +3,7 @@
 #include "signupform.h"
 #include "homepage.h"
 #include "session.h"
+#include "networkmanager.h"
 
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
@@ -10,15 +11,12 @@
 LoginForm::LoginForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::LoginForm)
-    , network(new NetworkManager(this))
 {
     ui->setupUi(this);
     setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
     setupInputValidation(ui->passwordEdit, "^[A-Za-z0-9!@#\\$%\\^&\\*]{1,50}$");
 
-    network->connectToServer();
-
-    connect(network, &NetworkManager::loginResponse, this, &LoginForm::handleLoginResponse);
+    connect(&NetworkManager::instance(), &NetworkManager::loginResponse, this, &LoginForm::handleLoginResponse);
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginForm::handleLoginClicked);
     connect(ui->signUpButton, &QPushButton::clicked, this, &LoginForm::handleSignUpClicked);
     connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &LoginForm::handleShowPasswordToggled);
@@ -32,7 +30,7 @@ LoginForm::LoginForm(QWidget *parent)
         // autologin
         QString username = Session::instance().username();
         QString token = Session::instance().token();
-        network->sendTokenLogin(username, token);
+        NetworkManager::instance().sendTokenLogin(username, token);
     }
 }
 
@@ -51,12 +49,12 @@ void LoginForm::handleLoginClicked()
         ui->warningLabel->clear();
     }
 
-    network->sendLogin(username, password, remember);
+    NetworkManager::instance().sendLogin(username, password, remember);
 }
 
 void LoginForm::handleSignUpClicked()
 {
-    SignUpForm *form = new SignUpForm(this, this->network);
+    SignUpForm *form = new SignUpForm(this);
     form->show();
     this->hide();
 }

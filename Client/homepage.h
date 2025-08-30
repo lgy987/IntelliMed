@@ -2,6 +2,7 @@
 #define HOMEPAGE_H
 
 #include <QMainWindow>
+#include <QPushButton>
 
 namespace Ui {
 class HomePage;
@@ -19,6 +20,10 @@ public:
 private:
     Ui::HomePage *ui;
     QWidget *loginForm;
+    void handlePersonalInfoClicked();
+    void setupButtons();
+    QList<QPushButton*> buttons;
+    void setupPersonalInfoForm();
 };
 
 #endif // HOMEPAGE_H

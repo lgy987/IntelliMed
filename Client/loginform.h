@@ -2,7 +2,6 @@
 #define LOGINFORM_H
 
 #include <QWidget>
-#include "networkmanager.h"
 #include <QLineEdit>
 #include <QLabel>
 
@@ -25,7 +24,6 @@ private slots:
 
 private:
     Ui::LoginForm *ui;
-    NetworkManager *network;
 };
 
 #endif // LOGINFORM_H

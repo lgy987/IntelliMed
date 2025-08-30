@@ -13,6 +13,7 @@ SOURCES += \
     main.cpp \
     loginform.cpp \
     networkmanager.cpp \
+    personalinfoform.cpp \
     session.cpp \
     signupform.cpp
 
@@ -20,12 +21,14 @@ HEADERS += \
     homepage.h \
     loginform.h \
     networkmanager.h \
+    personalinfoform.h \
     session.h \
     signupform.h
 
 FORMS += \
     homepage.ui \
     loginform.ui \
+    personalinfoform.ui \
     signupform.ui
 
 # Default rules for deployment.

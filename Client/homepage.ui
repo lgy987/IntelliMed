@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
+    <width>1000</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,32 +14,14 @@
    <string>Home Page</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_main">
+   <layout class="QHBoxLayout" name="horizontalLayout_main">
+    <!-- Sidebar buttons -->
     <item>
-     <widget class="QLabel" name="labelHeader">
-      <property name="styleSheet">
-       <string notr="true">
-        font-size: 22px;
-        font-weight: bold;
-        color: white;
-        background-color: qlineargradient(x1:0,y1:0,x2:1,y2:0,
-                                          stop:0 #2193b0, stop:1 #6dd5ed);
-        padding: 15px;
-        border-radius: 8px;
-       </string>
+     <widget class="QWidget" name="sidebar">
+      <property name="minimumWidth">
+       <number>180</number>
       </property>
-      <property name="text">
-       <string>🏥 医疗管理系统 - 首页</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_content">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_nav">
+      <layout class="QVBoxLayout" name="verticalLayout_sidebar">
         <item>
          <widget class="QPushButton" name="btnUser">
           <property name="text">
@@ -82,39 +64,41 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="labelWelcome">
-        <property name="styleSheet">
-         <string notr="true">
-          font-size: 18px;
-          color: #333;
-          padding: 30px;
-         </string>
-        </property>
-        <property name="text">
-         <string>欢迎使用医疗管理系统！</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+      </layout>
+      <property name="styleSheet">
+       <string notr="true">
+       </string>
+      </property>
+     </widget>
+    </item>
+
+    <!-- Main content area -->
+    <item>
+     <widget class="QStackedWidget" name="stackedPages">
+      <widget class="QWidget" name="pageUser"/>
+      <widget class="QWidget" name="pageAppointment"/>
+      <widget class="QWidget" name="pageCases"/>
+      <widget class="QWidget" name="pageOrders"/>
+      <widget class="QWidget" name="pageHealth"/>
+      <widget class="QWidget" name="pageLogout"/>
+     </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>900</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QMenuBar" name="menubar"/>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>

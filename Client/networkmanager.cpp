@@ -1,4 +1,5 @@
 #include "networkmanager.h"
+#include "session.h"
 #include <QJsonDocument>
 #include <QDebug>
 
@@ -9,6 +10,11 @@ NetworkManager::NetworkManager(QObject *parent) : QObject(parent)
 }
 
 NetworkManager::~NetworkManager() { }
+
+NetworkManager& NetworkManager::instance() {
+    static NetworkManager instance;
+    return instance;
+}
 
 void NetworkManager::connectToServer(const QString &host, quint16 port)
 {
@@ -51,12 +57,31 @@ void NetworkManager::sendSignUp(const QString &username, const QString &password
     socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
 }
 
+void NetworkManager::sendGetPersonalInfo()
+{
+    QJsonObject req;
+    req["action"] = "getPersonalInfo";
+    req["token"]  = Session::instance().token();
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void NetworkManager::sendUpdatePersonalInfo(const QJsonObject &data)
+{
+    QJsonObject req = data;
+    req["action"] = "updatePersonalInfo";
+    req["token"]  = Session::instance().token();
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
 void NetworkManager::onReadyRead()
 {
     while (socket->canReadLine()) {
         QByteArray line = socket->readLine().trimmed();
         QJsonDocument doc = QJsonDocument::fromJson(line);
-
         if (!doc.isObject()) continue;
         QJsonObject obj = doc.object();
 
@@ -65,6 +90,8 @@ void NetworkManager::onReadyRead()
             emit signUpResponse(obj);
         } else if (action == "login") {
             emit loginResponse(obj);
+        } else if (action == "getPersonalInfo" || action == "updatePersonalInfo") {
+            emit personalInfoResponse(obj);
         }
     }
 }

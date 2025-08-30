@@ -2,7 +2,6 @@
 #define SIGNUPFORM_H
 
 #include <QWidget>
-#include "networkmanager.h"
 
 namespace Ui {
 class SignUpForm;
@@ -13,7 +12,7 @@ class SignUpForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit SignUpForm(QWidget *loginForm, NetworkManager *network, QWidget *parent = nullptr);
+    explicit SignUpForm(QWidget *loginForm, QWidget *parent = nullptr);
     ~SignUpForm();
 
 private slots:
@@ -30,7 +29,6 @@ private slots:
 private:
     Ui::SignUpForm *ui;
     QWidget *loginForm;
-    NetworkManager *network;
 };
 
 #endif // SIGNUPFORM_H

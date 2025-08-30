@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>380</width>
-    <height>546</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -78,14 +78,14 @@
         }
       </string>
      </property>
-     <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0,0,0,0,0">
+     <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0,0,0,0,0,0">
       <item>
        <widget class="QLabel" name="titleLabel">
         <property name="styleSheet">
          <string notr="true">font-size:22px; font-weight:bold; margin:10px 0;</string>
         </property>
         <property name="text">
-         <string>Create Account</string>
+         <string>注册</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -110,14 +110,14 @@
       <item>
        <widget class="QLineEdit" name="usernameEdit">
         <property name="placeholderText">
-         <string>Username</string>
+         <string>用户名</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLineEdit" name="emailEdit">
         <property name="placeholderText">
-         <string>Email</string>
+         <string>邮箱</string>
         </property>
        </widget>
       </item>
@@ -127,7 +127,7 @@
          <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
-         <string>Password</string>
+         <string>密码</string>
         </property>
        </widget>
       </item>
@@ -137,14 +137,14 @@
          <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
-         <string>Confirm Password</string>
+         <string>确认密码</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="showPasswordCheckBox">
         <property name="text">
-         <string>Show Password</string>
+         <string>显示密码</string>
         </property>
        </widget>
       </item>
@@ -170,14 +170,14 @@
       <item>
        <widget class="QPushButton" name="signUpButton">
         <property name="text">
-         <string>Sign Up</string>
+         <string>注册</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="backToLoginButton">
         <property name="text">
-         <string>Back to Login</string>
+         <string>返回登陆</string>
         </property>
        </widget>
       </item>

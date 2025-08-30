@@ -4,9 +4,8 @@
 #include "homepage.h"
 #include "session.h"
 
-#include <QMessageBox>
-#include <QPainter>
-#include <QPainterPath>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 LoginForm::LoginForm(QWidget *parent)
     : QWidget(parent)
@@ -14,6 +13,8 @@ LoginForm::LoginForm(QWidget *parent)
     , network(new NetworkManager(this))
 {
     ui->setupUi(this);
+    setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
+    setupInputValidation(ui->passwordEdit, "^[A-Za-z0-9!@#\\$%\\^&\\*]{1,50}$");
 
     network->connectToServer();
 
@@ -44,7 +45,7 @@ void LoginForm::handleLoginClicked()
     bool remember    = ui->rememberCheckBox->isChecked();
 
     if (username.isEmpty() || password.isEmpty()) {
-        ui->warningLabel->setText("Please enter username and password.");
+        ui->warningLabel->setText("请输入用户名和密码");
         return;
     } else {
         ui->warningLabel->clear();
@@ -82,10 +83,8 @@ void LoginForm::handleLoginResponse(const QJsonObject &obj)
         this->hide();
     } else if (obj["status"].toString() == "retry") {
         Session::instance().clear();
-        QString msg = obj.value("message").toString("Invalid token");
-        ui->warningLabel->setText(msg);
     } else {
-        QString msg = obj.value("message").toString("Invalid username or password.");
+        QString msg = obj.value("message").toString("用户名或密码错误");
         ui->warningLabel->setText(msg);
     }
 }
@@ -93,4 +92,12 @@ void LoginForm::handleLoginResponse(const QJsonObject &obj)
 void LoginForm::handleShowPasswordToggled(bool checked)
 {
     ui->passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
+}
+
+
+void LoginForm::setupInputValidation(QLineEdit *lineEdit, const QString &pattern) {
+    static QRegularExpressionValidator *validator = nullptr;
+    QRegularExpression regex(pattern);
+    validator = new QRegularExpressionValidator(regex, lineEdit);
+    lineEdit->setValidator(validator);
 }

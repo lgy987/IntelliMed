@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include "networkmanager.h"
+#include <QLineEdit>
+#include <QLabel>
 
 namespace Ui { class LoginForm; }
 
@@ -13,6 +15,7 @@ class LoginForm : public QWidget
 public:
     explicit LoginForm(QWidget *parent = nullptr);
     ~LoginForm();
+    static void setupInputValidation(QLineEdit *lineEdit, const QString &pattern);
 
 private slots:
     void handleLoginClicked();

@@ -92,7 +92,7 @@
          <string notr="true">font-size:22px; font-weight:bold; margin:10px 0;</string>
         </property>
         <property name="text">
-         <string>Welcome Back</string>
+         <string>登陆</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -117,7 +117,7 @@
       <item>
        <widget class="QLineEdit" name="usernameEdit">
         <property name="placeholderText">
-         <string>Username</string>
+         <string>用户名</string>
         </property>
        </widget>
       </item>
@@ -127,14 +127,14 @@
          <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
-         <string>Password</string>
+         <string>密码</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="showPasswordCheckBox">
         <property name="text">
-         <string>Show Password</string>
+         <string>显示密码</string>
         </property>
        </widget>
       </item>
@@ -160,21 +160,21 @@
       <item>
        <widget class="QCheckBox" name="rememberCheckBox">
         <property name="text">
-         <string>Remember Me</string>
+         <string>记住我</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="loginButton">
         <property name="text">
-         <string>Login</string>
+         <string>登陆</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="signUpButton">
         <property name="text">
-         <string>Sign Up</string>
+         <string>注册新账号</string>
         </property>
        </widget>
       </item>

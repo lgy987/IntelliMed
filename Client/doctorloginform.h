@@ -1,19 +1,19 @@
-#ifndef LOGINFORM_H
-#define LOGINFORM_H
+#ifndef DOCTORLOGINFORM_H
+#define DOCTORLOGINFORM_H
 
 #include <QWidget>
 #include <QLineEdit>
 #include <QLabel>
 
-namespace Ui { class LoginForm; }
+namespace Ui { class DoctorLoginForm; }
 
-class LoginForm : public QWidget
+class DoctorLoginForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit LoginForm(QWidget *parent = nullptr);
-    ~LoginForm();
+    explicit DoctorLoginForm(QWidget *liform, QWidget *parent = nullptr);
+    ~DoctorLoginForm();
     static void setupInputValidation(QLineEdit *lineEdit, const QString &pattern);
 
 private slots:
@@ -21,13 +21,13 @@ private slots:
     void handleSignUpClicked();
     void handleLoginResponse(const QJsonObject &obj);
     void handleShowPasswordToggled(bool checked);
-    void handleDoctorLoginClicked();
+    void handlePatientLoginClicked();
 
 private:
-    QWidget *dlform;
-    QWidget *suform;
-    QWidget *homepage;
-    Ui::LoginForm *ui;
+    QWidget *liform;
+    QWidget *dsuform;
+    QWidget *dhomepage;
+    Ui::DoctorLoginForm *ui;
 };
 
 #endif // LOGINFORM_H

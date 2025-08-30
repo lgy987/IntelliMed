@@ -1,67 +1,67 @@
-#include "signupform.h"
-#include "ui_signupform.h"
-#include "loginform.h"
+#include "doctorsignupform.h"
+#include "ui_doctorsignupform.h"
+#include "doctorloginform.h"
 #include "networkmanager.h"
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QJsonDocument>
 
-SignUpForm::SignUpForm(QWidget *loginForm, QWidget *parent) :
+DoctorSignUpForm::DoctorSignUpForm(QWidget *dloginForm, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::SignUpForm),
-    loginForm(loginForm)
+    ui(new Ui::DoctorSignUpForm),
+    dloginForm(dloginForm)
 {
     ui->setupUi(this);
-    LoginForm::setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
-    LoginForm::setupInputValidation(ui->passwordEdit, "^[A-Za-z0-9!@#\\$%\\^&\\*]{1,50}$");
-    LoginForm::setupInputValidation(ui->emailEdit, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,50}$)");
+    DoctorLoginForm::setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
+    DoctorLoginForm::setupInputValidation(ui->passwordEdit, "^[A-Za-z0-9!@#\\$%\\^&\\*]{1,50}$");
+    DoctorLoginForm::setupInputValidation(ui->emailEdit, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,50}$)");
 
-    connect(ui->signUpButton, &QPushButton::clicked, this, &SignUpForm::handleSignUpClicked);
-    connect(ui->backToLoginButton, &QPushButton::clicked, this, &SignUpForm::handleBackToLoginClicked);
+    connect(ui->signUpButton, &QPushButton::clicked, this, &DoctorSignUpForm::handleSignUpClicked);
+    connect(ui->backToLoginButton, &QPushButton::clicked, this, &DoctorSignUpForm::handleBackToLoginClicked);
 
-    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &SignUpForm::handleShowPasswordToggled);
-    connect(ui->passwordEdit, &QLineEdit::editingFinished, this, &SignUpForm::checkPasswordLength);
-    connect(ui->confirmPasswordEdit, &QLineEdit::editingFinished, this, &SignUpForm::checkConfirmPassword);
-    connect(ui->emailEdit, &QLineEdit::editingFinished, this, &SignUpForm::checkEmail);
+    connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &DoctorSignUpForm::handleShowPasswordToggled);
+    connect(ui->passwordEdit, &QLineEdit::editingFinished, this, &DoctorSignUpForm::checkPasswordLength);
+    connect(ui->confirmPasswordEdit, &QLineEdit::editingFinished, this, &DoctorSignUpForm::checkConfirmPassword);
+    connect(ui->emailEdit, &QLineEdit::editingFinished, this, &DoctorSignUpForm::checkEmail);
 
-    connect(&NetworkManager::instance(), &NetworkManager::signUpResponse, this, &SignUpForm::handleSignUpResponse);
+    connect(&NetworkManager::instance(), &NetworkManager::doctorSignUpResponse, this, &DoctorSignUpForm::handleSignUpResponse);
 }
 
-SignUpForm::~SignUpForm()
+DoctorSignUpForm::~DoctorSignUpForm()
 {
     delete ui;
 }
 
-void SignUpForm::handleSignUpClicked()
+void DoctorSignUpForm::handleSignUpClicked()
 {
     if(checkAllFields()) {
         QString username = ui->usernameEdit->text();
         QString password = ui->passwordEdit->text();
         QString email = ui->emailEdit->text();
 
-        NetworkManager::instance().sendSignUp(username, password, email);
+        NetworkManager::instance().sendDoctorSignUp(username, password, email);
     }
 }
 
-void SignUpForm::handleSignUpResponse(const QJsonObject &obj)
+void DoctorSignUpForm::handleSignUpResponse(const QJsonObject &obj)
 {
     if (obj["status"].toString() == "ok") {
         QMessageBox::information(this, "Sign Up", obj.value("message").toString("注册成功"));
-        this->deleteLater();
-        if (loginForm) loginForm->show();
+        if (dloginForm) dloginForm->show();
+        this->hide();
     } else {
         QString msg = obj.value("message").toString("注册失败");
         ui->warningLabel->setText(msg);
     }
 }
 
-void SignUpForm::handleShowPasswordToggled(bool checked)
+void DoctorSignUpForm::handleShowPasswordToggled(bool checked)
 {
     ui->passwordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
     ui->confirmPasswordEdit->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
 }
 
-void SignUpForm::checkPasswordLength()
+void DoctorSignUpForm::checkPasswordLength()
 {
     QString password = ui->passwordEdit->text();
     if (password.length() < 8) {
@@ -71,7 +71,7 @@ void SignUpForm::checkPasswordLength()
     }
 }
 
-void SignUpForm::checkConfirmPassword()
+void DoctorSignUpForm::checkConfirmPassword()
 {
     QString password = ui->passwordEdit->text();
     QString confirmPassword = ui->confirmPasswordEdit->text();
@@ -84,7 +84,7 @@ void SignUpForm::checkConfirmPassword()
     }
 }
 
-void SignUpForm::checkEmail()
+void DoctorSignUpForm::checkEmail()
 {
     QString email = ui->emailEdit->text();
     if (!isValidEmail(email)) {
@@ -94,13 +94,13 @@ void SignUpForm::checkEmail()
     }
 }
 
-void SignUpForm::handleBackToLoginClicked()
+void DoctorSignUpForm::handleBackToLoginClicked()
 {
     this->hide();
-    if (loginForm) loginForm->show();
+    if (dloginForm) dloginForm->show();
 }
 
-bool SignUpForm::isValidEmail(const QString &email)
+bool DoctorSignUpForm::isValidEmail(const QString &email)
 {
     static const QRegularExpression regex(
         R"((^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$))"
@@ -108,7 +108,7 @@ bool SignUpForm::isValidEmail(const QString &email)
     return regex.match(email).hasMatch();
 }
 
-bool SignUpForm::checkAllFields(){
+bool DoctorSignUpForm::checkAllFields(){
     QString username = ui->usernameEdit->text();
     QString email = ui->emailEdit->text();
     QString password = ui->passwordEdit->text();

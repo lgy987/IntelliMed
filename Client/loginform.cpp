@@ -1,15 +1,20 @@
 #include "loginform.h"
 #include "ui_loginform.h"
 #include "signupform.h"
+#include "doctorloginform.h"
 #include "homepage.h"
 #include "session.h"
 #include "networkmanager.h"
 
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QDebug>
 
 LoginForm::LoginForm(QWidget *parent)
     : QWidget(parent)
+    , dlform(nullptr)
+    , suform(nullptr)
+    , homepage(nullptr)
     , ui(new Ui::LoginForm)
 {
     ui->setupUi(this);
@@ -19,6 +24,7 @@ LoginForm::LoginForm(QWidget *parent)
     connect(&NetworkManager::instance(), &NetworkManager::loginResponse, this, &LoginForm::handleLoginResponse);
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginForm::handleLoginClicked);
     connect(ui->signUpButton, &QPushButton::clicked, this, &LoginForm::handleSignUpClicked);
+    connect(ui->doctorLoginButton, &QPushButton::clicked, this, &LoginForm::handleDoctorLoginClicked);
     connect(ui->showPasswordCheckBox, &QCheckBox::toggled, this, &LoginForm::handleShowPasswordToggled);
 
     if (!Session::instance().username().isEmpty()) {
@@ -54,8 +60,19 @@ void LoginForm::handleLoginClicked()
 
 void LoginForm::handleSignUpClicked()
 {
-    SignUpForm *form = new SignUpForm(this);
-    form->show();
+    if(!suform) {
+        suform = new SignUpForm(this);
+    }
+    suform->show();
+    this->hide();
+}
+
+void LoginForm::handleDoctorLoginClicked()
+{
+    if(!dlform) {
+        dlform = new DoctorLoginForm(this);
+    }
+    dlform->show();
     this->hide();
 }
 
@@ -75,9 +92,10 @@ void LoginForm::handleLoginResponse(const QJsonObject &obj)
 
         // Only update session if login/token is valid
         Session::instance().setUser(username, userId, token);
-
-        HomePage *home = new HomePage(this);
-        home->show();
+        if(!homepage){
+            homepage = new HomePage(this);
+        }
+        homepage->show();
         this->hide();
     } else if (obj["status"].toString() == "retry") {
         Session::instance().clear();
@@ -94,8 +112,7 @@ void LoginForm::handleShowPasswordToggled(bool checked)
 
 
 void LoginForm::setupInputValidation(QLineEdit *lineEdit, const QString &pattern) {
-    static QRegularExpressionValidator *validator = nullptr;
     QRegularExpression regex(pattern);
-    validator = new QRegularExpressionValidator(regex, lineEdit);
+    auto *validator = new QRegularExpressionValidator(regex, lineEdit);
     lineEdit->setValidator(validator);
 }

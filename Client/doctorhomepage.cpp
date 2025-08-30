@@ -1,12 +1,12 @@
-#include "homepage.h"
-#include "ui_homepage.h"
-#include "personalinfoform.h"
-#include "session.h"
+#include "doctorhomepage.h"
+#include "ui_doctorhomepage.h"
+#include "doctorpersonalinfoform.h"
+#include "doctorsession.h"
 
-HomePage::HomePage(QWidget *loginForm, QWidget *parent)
+DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::HomePage)
-    , loginForm(loginForm)
+    , ui(new Ui::DoctorHomePage)
+    , dloginForm(dloginForm)
 {
     ui->setupUi(this);
     setupButtons();
@@ -17,37 +17,37 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
         sidebarLayout->setSpacing(4);                 // spacing between buttons
     }
 
-    connect(ui->btnLogout, &QPushButton::clicked, this, &HomePage::handleLogout);
+    connect(ui->btnLogout, &QPushButton::clicked, this, &DoctorHomePage::handleLogout);
 }
 
-HomePage::~HomePage()
+DoctorHomePage::~DoctorHomePage()
 {
     delete ui;
 }
 
-void HomePage::handleLogout()
+void DoctorHomePage::handleLogout()
 {
     // Clear session
-    Session::instance().clear();
+    DoctorSession::instance().clear();
 
     // Show the login form again
-    if (loginForm) {
-        loginForm->show();
+    if (dloginForm) {
+        dloginForm->show();
     }
 
     this->hide();
 }
 
-void HomePage::setupPersonalInfoForm()
+void DoctorHomePage::setupPersonalInfoForm()
 {
-    PersonalInfoForm* piform = new PersonalInfoForm(this);
+    DoctorPersonalInfoForm* dpiform = new DoctorPersonalInfoForm(this);
     // Add it to the stacked page layout
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(0));
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(piform);
+    layout->addWidget(dpiform);
 }
 
-void HomePage::setupButtons()
+void DoctorHomePage::setupButtons()
 {
     // Set all buttons initially as inactive (gray / transparent)
     QString inactiveStyle = R"(

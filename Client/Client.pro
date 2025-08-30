@@ -9,6 +9,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    doctorhomepage.cpp \
+    doctorloginform.cpp \
+    doctorpersonalinfoform.cpp \
+    doctorsession.cpp \
+    doctorsignupform.cpp \
     homepage.cpp \
     main.cpp \
     loginform.cpp \
@@ -18,6 +23,11 @@ SOURCES += \
     signupform.cpp
 
 HEADERS += \
+    doctorhomepage.h \
+    doctorloginform.h \
+    doctorpersonalinfoform.h \
+    doctorsession.h \
+    doctorsignupform.h \
     homepage.h \
     loginform.h \
     networkmanager.h \
@@ -26,6 +36,10 @@ HEADERS += \
     signupform.h
 
 FORMS += \
+    doctorhomepage.ui \
+    doctorloginform.ui \
+    doctorpersonalinfoform.ui \
+    doctorsignupform.ui \
     homepage.ui \
     loginform.ui \
     personalinfoform.ui \

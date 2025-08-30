@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DoctorHomePage</class>
+ <widget class="QMainWindow" name="DoctorHomePage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Home Page</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_main">
+    <!-- Sidebar buttons -->
+    <item>
+     <widget class="QWidget" name="sidebar">
+      <property name="minimumWidth">
+       <number>180</number>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_sidebar">
+        <item>
+         <widget class="QPushButton" name="btnUser">
+          <property name="text">
+           <string>👤 用户管理</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAppointment">
+          <property name="text">
+           <string>📅 挂号预约</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnCases">
+          <property name="text">
+           <string>📄 病例管理</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnOrders">
+          <property name="text">
+           <string>💊 医嘱管理</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnHealth">
+          <property name="text">
+           <string>❤️ 健康评估</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnLogout">
+          <property name="text">
+           <string>登出</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+      </layout>
+      <property name="styleSheet">
+       <string notr="true">
+       </string>
+      </property>
+     </widget>
+    </item>
+
+    <!-- Main content area -->
+    <item>
+     <widget class="QStackedWidget" name="stackedPages">
+      <widget class="QWidget" name="pageUser"/>
+      <widget class="QWidget" name="pageAppointment"/>
+      <widget class="QWidget" name="pageCases"/>
+      <widget class="QWidget" name="pageOrders"/>
+      <widget class="QWidget" name="pageHealth"/>
+      <widget class="QWidget" name="pageLogout"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LoginForm</class>
- <widget class="QWidget" name="LoginForm">
+ <class>DoctorSignUpForm</class>
+ <widget class="QWidget" name="DoctorSignUpForm">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>380</width>
-    <height>534</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Login</string>
+   <string>Sign Up</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -28,7 +28,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QFrame" name="loginFrame">
+    <widget class="QFrame" name="signUpFrame">
      <property name="styleSheet">
       <string notr="true">
         QFrame {
@@ -61,28 +61,21 @@
         QLineEdit, QCheckBox {
             color: black;
         }
-        #loginButton {
+        #signUpButton {
             background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                                              stop:0 #3b82f6, stop:1 #2563eb);
             color: white;
         }
-        #loginButton:hover {
+        #signUpButton:hover {
             background-color: #1d4ed8;
         }
-        #signUpButton, #doctorLoginButton {
+        #backToLoginButton {
             background: #e5e7eb;
             color: #111827;
         }
-        #signUpButton:hover, #doctorLoginButton:hover {
+        #backToLoginButton:hover {
             background: #d1d5db;
         }
-        #forgotPasswordLabel {
-            color: #3b82f6;
-            font-size: 12px;
-        }
-        #forgotPasswordLabel:hover {
-            text-decoration: underline;
-        }        
       </string>
      </property>
      <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0,0,0,0,0,0">
@@ -92,7 +85,7 @@
          <string notr="true">font-size:22px; font-weight:bold; margin:10px 0;</string>
         </property>
         <property name="text">
-         <string>登陆</string>
+         <string>医生注册</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -122,12 +115,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QLineEdit" name="emailEdit">
+        <property name="placeholderText">
+         <string>邮箱</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="passwordEdit">
         <property name="echoMode">
          <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
          <string>密码</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="confirmPasswordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::EchoMode::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>确认密码</string>
         </property>
        </widget>
       </item>
@@ -158,30 +168,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="rememberCheckBox">
-        <property name="text">
-         <string>记住我</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="loginButton">
-        <property name="text">
-         <string>登陆</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="signUpButton">
         <property name="text">
-         <string>注册新账号</string>
+         <string>注册</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="doctorLoginButton">
+       <widget class="QPushButton" name="backToLoginButton">
         <property name="text">
-         <string>切换至医生端</string>
+         <string>返回登陆</string>
         </property>
        </widget>
       </item>

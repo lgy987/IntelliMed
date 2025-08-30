@@ -39,6 +39,21 @@ void Server::onReadyRead() {
     }
 }
 
+// Send a JSON reply to client
+void Server::sendResponse(QTcpSocket *client, const QJsonObject &reply) {
+    QJsonDocument responseDoc(reply);
+    client->write(responseDoc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void Server::onDisconnected() {
+    QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
+    if (client) {
+        clients.removeAll(client);
+        client->deleteLater();
+        qDebug() << "Client disconnected.";
+    }
+}
+
 // Handle different actions based on request
 QJsonObject Server::handleAction(const QJsonObject &request) {
     QString action = request["action"].toString();
@@ -52,6 +67,16 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
         return handleGetPersonalInfo(request);
     } else if (action == "updatePersonalInfo") {
         return handleUpdatePersonalInfo(request);
+    } else if (action == "doctorLogin") {
+        return handleDoctorLogin(request);
+    } else if (action == "doctorTokenLogin") {
+        return handleDoctorTokenLogin(request);
+    } else if (action == "doctorSignup") {
+        return handleDoctorSignUp(request);
+    } else if (action == "doctorGetPersonalInfo") {
+        return handleDoctorGetPersonalInfo(request);
+    } else if (action == "doctorUpdatePersonalInfo") {
+        return handleDoctorUpdatePersonalInfo(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -164,21 +189,6 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
     return reply;
 }
 
-// Send a JSON reply to client
-void Server::sendResponse(QTcpSocket *client, const QJsonObject &reply) {
-    QJsonDocument responseDoc(reply);
-    client->write(responseDoc.toJson(QJsonDocument::Compact) + "\n");
-}
-
-void Server::onDisconnected() {
-    QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
-    if (client) {
-        clients.removeAll(client);
-        client->deleteLater();
-        qDebug() << "Client disconnected.";
-    }
-}
-
 QJsonObject Server::createSessionForUser(const int &userId, const QString &username) {
     // Generate token
     QString token = generateToken();
@@ -207,10 +217,134 @@ QJsonObject Server::createSessionForUser(const int &userId, const QString &usern
     return reply;
 }
 
-QString Server::generateToken() {
-    QByteArray randomBytes = QUuid::createUuid().toByteArray();
-    QString token = QCryptographicHash::hash(randomBytes, QCryptographicHash::Sha256).toHex();
-    return token;
+QJsonObject Server::handleDoctorLogin(const QJsonObject &request) {
+    QString username = request["username"].toString();
+    QString password = request["password"].toString();
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM doctors WHERE username = :username AND password = :password");
+    query.bindValue(":username", username);
+    query.bindValue(":password", password);
+
+    if (query.exec() && query.next()) {
+        int userId = query.value("id").toInt();
+        return createSessionForDoctor(userId, username);
+    } else {
+        QJsonObject reply;
+        reply["action"] = "doctorLogin";
+        reply["status"] = "error";
+        reply["message"] = "登录信息无效";
+        return reply;
+    }
+}
+
+// Handle token-based login
+int Server::checkDoctorToken(const QString &token) {
+    if (token.isEmpty()) return -1;
+
+    QSqlQuery query;
+    query.prepare("SELECT id FROM doctors WHERE token = :token AND token_expiry > :now");
+    query.bindValue(":token", token);
+    query.bindValue(":now", QDateTime::currentSecsSinceEpoch());
+
+    if (query.exec() && query.next()) {
+        return query.value("id").toInt(); // valid token -> userId
+    }
+    return -1; // invalid token
+}
+
+// Revised handleTokenLogin using checkToken
+QJsonObject Server::handleDoctorTokenLogin(const QJsonObject &request) {
+    QString token = request["token"].toString();
+    int userId = checkDoctorToken(token);
+
+    QJsonObject reply;
+    reply["action"] = "doctorLogin";
+
+    if (userId > 0) {
+        // Token valid, renew session
+        QSqlQuery query;
+        query.prepare("SELECT username FROM doctors WHERE id = :id");
+        query.bindValue(":id", userId);
+        QString username;
+        if (query.exec() && query.next()) {
+            username = query.value("username").toString();
+        }
+        return createSessionForDoctor(userId, username);
+    } else {
+        reply["status"] = "retry";
+        return reply;
+    }
+}
+
+// Handle user signup
+QJsonObject Server::handleDoctorSignUp(const QJsonObject &request) {
+    QString username = request["username"].toString();
+    QString password = request["password"].toString();
+    QString email    = request["email"].toString();
+
+    QJsonObject reply;
+    reply["action"] = "doctorSignup";
+    if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+        reply["status"] = "error";
+        reply["message"] = "所有字段均为必填项";
+    } else {
+        QSqlQuery insertQuery;
+        insertQuery.prepare("INSERT INTO doctors (username, password, email) "
+                            "VALUES (:username, :password, :email)");
+        insertQuery.bindValue(":username", username);
+        insertQuery.bindValue(":password", password);
+        insertQuery.bindValue(":email", email);
+
+        if (!insertQuery.exec()) {
+            QSqlError err = insertQuery.lastError();
+            if (err.nativeErrorCode() == "2067" || err.databaseText().contains("UNIQUE")) {
+                // 2067 is SQLite constraint code; databaseText often mentions UNIQUE
+                reply["status"] = "error";
+                if (err.databaseText().contains("username"))
+                    reply["message"] = "用户名已存在";
+                else if (err.databaseText().contains("email"))
+                    reply["message"] = "邮箱已存在";
+                else
+                    reply["message"] = "唯一约束冲突";
+            } else {
+                reply["status"] = "error";
+                reply["message"] = err.text();
+            }
+        } else {
+            reply["status"] = "ok";
+            reply["message"] = "注册成功";
+        }
+    }
+    return reply;
+}
+
+QJsonObject Server::createSessionForDoctor(const int &userId, const QString &username) {
+    // Generate token
+    QString token = generateToken();
+
+    // Optional: set token expiry (e.g., 1 hour from now)
+    qint64 now = QDateTime::currentSecsSinceEpoch();
+    qint64 duration = 24 * 3600; // 1 day
+    qint64 expiry = now + duration;
+
+    // Update database
+    QSqlQuery update;
+    update.prepare("UPDATE doctors SET token = :token, token_expiry = :expiry WHERE id = :id");
+    update.bindValue(":token", token);
+    update.bindValue(":expiry", static_cast<qint64>(expiry));
+    update.bindValue(":id", userId);
+    update.exec();
+
+    // Prepare reply
+    QJsonObject reply;
+    reply["action"] = "doctorLogin";
+    reply["status"] = "ok";
+    reply["token"] = token;
+    reply["userId"] = userId;
+    reply["username"] = username;
+
+    return reply;
 }
 
 QJsonObject Server::handleGetPersonalInfo(const QJsonObject &request) {
@@ -294,4 +428,93 @@ QJsonObject Server::handleUpdatePersonalInfo(const QJsonObject &request) {
     }
 
     return reply;
+}
+
+QJsonObject Server::handleDoctorGetPersonalInfo(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "doctorGetPersonalInfo";
+
+    QString token = request["token"].toString();
+    int userId = checkDoctorToken(token);
+    if (userId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的token，请重新登录";
+        return reply;
+    }
+
+    QSqlQuery query;
+    // LEFT JOIN to make sure we still get username/email even if no personal_info row exists yet
+    query.prepare(R"(
+        SELECT u.username, u.email,
+               p.name, p.title, p.description
+        FROM doctors u
+        LEFT JOIN doctor_personal_info p ON u.id = p.id
+        WHERE u.id = :id
+    )");
+    query.bindValue(":id", userId);
+
+    if (query.exec() && query.next()) {
+        reply["status"]       = "ok";
+        reply["username"]     = query.value("username").toString();
+        reply["email"]        = query.value("email").toString();
+        reply["name"]         = query.value("name").toString();
+        reply["title"]    = query.value("title").toString();
+        reply["description"] = query.value("description").toString();
+    } else {
+        // This should never happen if userId is valid, but fallback anyway
+        reply["status"]       = "ok";
+        reply["username"]     = "";
+        reply["email"]        = "";
+        reply["name"]         = "";
+        reply["title"]    = "";
+        reply["description"] = "";
+    }
+
+    return reply;
+}
+
+QJsonObject Server::handleDoctorUpdatePersonalInfo(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "doctorUpdatePersonalInfo";
+
+    QString token = request["token"].toString();
+    int userId = checkDoctorToken(token);
+    if (userId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "userId不能为空或无效";
+        return reply;
+    }
+
+    QString name = request["name"].toString().trimmed();
+    QString title = request["title"].toString().trimmed();
+    QString description = request["description"].toString().trimmed();
+
+    QSqlQuery query;
+    // Use INSERT with ON CONFLICT(id) DO UPDATE for upsert
+    query.prepare("INSERT INTO doctor_personal_info (id, name, title, description) "
+                  "VALUES (:id, :name, :title, :description) "
+                  "ON CONFLICT(id) DO UPDATE SET "
+                  "    name = excluded.name, "
+                  "    title = excluded.title, "
+                  "    description = excluded.description;");
+    query.bindValue(":id", userId);
+    query.bindValue(":name", name);
+    query.bindValue(":title", title);
+    query.bindValue(":description", description);
+
+    if (query.exec()) {
+        reply["status"] = "ok";
+        reply["message"] = "更新成功";
+    } else {
+        reply["status"] = "error";
+        reply["message"] = "更新失败：" + query.lastError().text();
+    }
+
+    return reply;
+}
+
+QString Server::generateToken() {
+    QByteArray randomBytes = QUuid::createUuid().toByteArray();
+    QString token = QCryptographicHash::hash(randomBytes, QCryptographicHash::Sha256).toHex();
+    return token;
 }

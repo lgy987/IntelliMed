@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LoginForm</class>
- <widget class="QWidget" name="LoginForm">
+ <class>DoctorLoginForm</class>
+ <widget class="QWidget" name="DoctorLoginForm">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -69,11 +69,11 @@
         #loginButton:hover {
             background-color: #1d4ed8;
         }
-        #signUpButton, #doctorLoginButton {
+        #signUpButton, #patientLoginButton {
             background: #e5e7eb;
             color: #111827;
         }
-        #signUpButton:hover, #doctorLoginButton:hover {
+        #signUpButton:hover, #patientLoginButton:hover {
             background: #d1d5db;
         }
         #forgotPasswordLabel {
@@ -82,7 +82,7 @@
         }
         #forgotPasswordLabel:hover {
             text-decoration: underline;
-        }        
+        }
       </string>
      </property>
      <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0,0,0,0,0,0">
@@ -92,7 +92,7 @@
          <string notr="true">font-size:22px; font-weight:bold; margin:10px 0;</string>
         </property>
         <property name="text">
-         <string>登陆</string>
+         <string>医生登陆</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -179,9 +179,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="doctorLoginButton">
+       <widget class="QPushButton" name="patientLoginButton">
         <property name="text">
-         <string>切换至医生端</string>
+         <string>切换至患者端</string>
         </property>
        </widget>
       </item>

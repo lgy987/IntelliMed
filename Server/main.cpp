@@ -27,12 +27,33 @@ bool initDatabase() {
         return false;
     }
 
+    if (!query.exec("CREATE TABLE IF NOT EXISTS doctors ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "username TEXT UNIQUE,"
+                    "password TEXT,"
+                    "email TEXT UNIQUE,"
+                    "token TEXT,"
+                    "token_expiry INTEGER)")) {
+        qCritical() << "Failed to create doctors table:" << query.lastError();
+        return false;
+    }
+
     if (!query.exec("CREATE TABLE IF NOT EXISTS personal_info ("
                     "id INTEGER PRIMARY KEY,"               // same as users.id
                     "name TEXT,"                    // real name
                     "id_number TEXT,"               // ID number
                     "phone_number TEXT,"                     // optional phone number, nullable
                     "FOREIGN KEY(id) REFERENCES users(id) ON DELETE CASCADE)")) {
+        qCritical() << "Failed to create personal_info table:" << query.lastError();
+        return false;
+    }
+
+    if (!query.exec("CREATE TABLE IF NOT EXISTS doctor_personal_info ("
+                    "id INTEGER PRIMARY KEY,"
+                    "name TEXT,"
+                    "title TEXT,"
+                    "description TEXT,"
+                    "FOREIGN KEY(id) REFERENCES doctors(id) ON DELETE CASCADE)")) {
         qCritical() << "Failed to create personal_info table:" << query.lastError();
         return false;
     }

@@ -4,9 +4,14 @@
 HealthAssess::HealthAssess(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::HealthAssess)
+    , m_dbManager(nullptr)
+    , m_dataViewer(nullptr)
 {
     ui->setupUi(this);
     setWindowTitle("健康自测问卷");
+    
+    setupDatabase();
+    setupUI();
 }
 
 HealthAssess::~HealthAssess()
@@ -156,13 +161,13 @@ void HealthAssess::on_pushButton_clicked()
     QString lifestyleChoices = collectSelectedOptions();
 
     QString name = ui->lineEdit_name->text().trimmed();
-    QString age = ui->lineEdit_age->text().trimmed();
+    int age = ui->lineEdit_age->text().toInt();
     QString gender = ui->lineEdit_gender->text().trimmed();
-    QString height = ui->lineEdit_height->text().trimmed();
-    QString weight = ui->lineEdit_weight->text().trimmed();
+    double height = ui->lineEdit_height->text().toDouble();
+    double weight = ui->lineEdit_weight->text().toDouble();
     QString phone = ui->lineEdit_phonenum->text().trimmed();
 
-    double bmiValue = weight.toDouble() * 10000 / height.toDouble() / height.toDouble();
+    double bmiValue = weight * 10000 / height / height;
 
     QString bmiStatus;
     if (bmiValue <= 18.4) bmiStatus = "偏瘦";
@@ -170,6 +175,15 @@ void HealthAssess::on_pushButton_clicked()
     else if (bmiValue < 28) bmiStatus = "偏胖";
     else if (bmiValue < 32) bmiStatus = "肥胖";
     else bmiStatus = "重度肥胖";
+
+    // 保存到数据库
+    bool saveSuccess = false;
+    if (m_dbManager && m_dbManager->isConnected()) {
+        saveSuccess = m_dbManager->insertPatientData(
+            name, age, gender, height, weight, phone,
+            bmiValue, bmiStatus, lifestyleChoices, score
+        );
+    }
 
     QString result = QString("提交成功！\n\n"
                             "姓名: %1\n"
@@ -180,15 +194,34 @@ void HealthAssess::on_pushButton_clicked()
                             "手机号: %6\n"
                             "BMI指数: %7 (%8)\n"
                             "生活方式选择: %9\n"
-                            "健康评分: %10")
+                            "健康评分: %10\n\n"
+                            "数据保存状态: %11")
                         .arg(name).arg(age).arg(gender)
                         .arg(height).arg(weight).arg(phone)
                         .arg(QString::number(bmiValue, 'f', 1))
                         .arg(bmiStatus)
                         .arg(lifestyleChoices)
-                        .arg(score);
+                        .arg(score)
+                        .arg(saveSuccess ? "已保存到数据库" : "保存失败");
 
     QMessageBox::information(this, "提交成功", result);
+
+    // 清空表单
+    ui->lineEdit_name->clear();
+    ui->lineEdit_age->clear();
+    ui->lineEdit_gender->clear();
+    ui->lineEdit_height->clear();
+    ui->lineEdit_weight->clear();
+    ui->lineEdit_phonenum->clear();
+    
+    // 取消所有复选框
+    ui->checkBox_regdiet->setChecked(false);
+    ui->checkBox_baldiet->setChecked(false);
+    ui->checkBox_regexe->setChecked(false);
+    ui->checkBox_enoslp->setChecked(false);
+    ui->checkBox_smodrk->setChecked(false);
+    ui->checkBox_strdep->setChecked(false);
+    ui->checkBox_chrdis->setChecked(false);
 
     qDebug() << "===== 问卷数据 =====";
     qDebug() << "姓名:" << name;
@@ -200,7 +233,36 @@ void HealthAssess::on_pushButton_clicked()
     qDebug() << "BMI指数:" << bmiValue << "(" << bmiStatus << ")";
     qDebug() << "生活方式选择:" << lifestyleChoices;
     qDebug() << "健康评分:" << score;
+    qDebug() << "数据库保存:" << (saveSuccess ? "成功" : "失败");
     qDebug() << "====================";
+}
+
+// 新增的数据库设置函数
+void HealthAssess::setupDatabase()
+{
+    m_dbManager = new DatabaseManager(this);
+    if (!m_dbManager->initializeDatabase()) {
+        QMessageBox::warning(this, "数据库错误", "数据库初始化失败，数据将无法保存");
+    }
+}
+
+// 新增的UI设置函数
+void HealthAssess::setupUI()
+{
+    // 连接UI文件中的查看数据按钮
+    connect(ui->viewDataButton, &QPushButton::clicked, this, &HealthAssess::on_viewDataButton_clicked);
+}
+
+// 新增的查看数据槽函数
+void HealthAssess::on_viewDataButton_clicked()
+{
+    if (!m_dataViewer) {
+        m_dataViewer = new DataViewer(m_dbManager);
+    }
+    
+    m_dataViewer->show();
+    m_dataViewer->raise();
+    m_dataViewer->activateWindow();
 }
 
 

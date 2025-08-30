@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>656</height>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -220,10 +220,20 @@
      </property>
     </widget>
    </item>
+   <item row="17" column="0" colspan="2">
+    <widget class="QPushButton" name="viewDataButton">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>用于医生端查看患者数据</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
 </ui>
-
-

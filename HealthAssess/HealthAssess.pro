@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,10 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    HealthAssess.cpp
+    HealthAssess.cpp \
+    DatabaseManager.cpp \
+    DataViewer.cpp
 
 HEADERS += \
-    HealthAssess.h
+    HealthAssess.h \
+    DatabaseManager.h \
+    DataViewer.h
 
 FORMS += \
     HealthAssess.ui

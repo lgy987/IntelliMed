@@ -1,26 +1,31 @@
 #pragma once
-#include <QTcpServer>
-#include <QTcpSocket>
+#include <QWebSocketServer>
+#include <QWebSocket>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QHash>
+#include "doctoradviceserver.h"
 
-class Server : public QTcpServer {
+class Server : public QObject {
     Q_OBJECT
 public:
     explicit Server(QObject *parent = nullptr);
-
-protected:
-    void incomingConnection(qintptr socketDescriptor) override;
+    bool start(quint16 port);
 
 private slots:
-    void onReadyRead();
+    void onNewConnection();
+    void onTextMessageReceived(const QString &message);
     void onDisconnected();
-    QJsonObject handleAction(const QJsonObject &request);
 
 private:
-    QList<QTcpSocket*> clients;
-    void sendResponse(QTcpSocket *client, const QJsonObject &reply);
+    QWebSocketServer *webSocketServer;
+    QHash<QString, QWebSocket*> clients;  // token/username -> socket
+
+    void sendResponse(QWebSocket *client, const QJsonObject &reply);
     QString generateToken();
+
+    // === Handlers ===
+    QJsonObject handleAction(const QJsonObject &request);
 
     QJsonObject handleLogin(const QJsonObject &request);
     QJsonObject handleTokenLogin(const QJsonObject &request);
@@ -44,4 +49,6 @@ private:
     QJsonObject handleGetMessages(const QJsonObject &request);
     QJsonObject handleSendMessage(const QJsonObject &request);
 
+    DoctorAdviceServer doctorAdviceServer;
+    QJsonObject forwardDoctorAdviceRequest(const QJsonObject &actionRequest);
 };

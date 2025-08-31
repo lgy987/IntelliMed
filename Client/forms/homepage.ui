@@ -34,7 +34,7 @@
       <item>
        <widget class="QPushButton" name="btnCases">
         <property name="text">
-         <string>📄 病例管理</string>
+         <string>📄 线上对话</string>
         </property>
        </widget>
       </item>

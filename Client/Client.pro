@@ -12,7 +12,9 @@ CONFIG += c++11
 INCLUDEPATH += include \
                include/doctor \
                include/patient \
-               include/network
+               include/network \
+               include/doctoradvice
+
 
 # Source files
 SOURCES += \

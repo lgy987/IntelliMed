@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include "doctoradviceserver.h"
 
 Server::Server(QObject *parent) : QTcpServer(parent) {
     if (!listen(QHostAddress::Any, 12345)) {
@@ -13,6 +14,7 @@ Server::Server(QObject *parent) : QTcpServer(parent) {
     } else {
         qDebug() << "Server listening on port 12345";
     }
+    //doctorAdviceServer.start();
 }
 
 void Server::incomingConnection(qintptr socketDescriptor) {
@@ -90,6 +92,8 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
         return handleGetMessages(request);
     } else if (action == "sendMessage") {
         return handleSendMessage(request);
+    } else if (action == "doctorAdvice") {
+        return forwardDoctorAdviceRequest(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -873,4 +877,15 @@ QString Server::generateToken() {
     QByteArray randomBytes = QUuid::createUuid().toByteArray();
     QString token = QCryptographicHash::hash(randomBytes, QCryptographicHash::Sha256).toHex();
     return token;
+}  // member
+
+
+QJsonObject Server::forwardDoctorAdviceRequest(const QJsonObject &actionRequest) {
+    // actionRequest: {"action":"doctorAdvice", "request": {...}}
+    if (actionRequest.value("action").toString() != "doctorAdvice")
+        return QJsonObject{{"type", "error"}, {"message", "invalid_action"}};
+
+    QJsonObject request = actionRequest.value("request").toObject();
+    QJsonObject response = doctorAdviceServer.handleRequest(request);
+    return response;
 }

@@ -1,4 +1,5 @@
 #include "HealthAssess.h"
+#include <QRegularExpression>
 #include "ui_HealthAssess.h"
 
 HealthAssess::HealthAssess(QWidget *parent)
@@ -32,8 +33,8 @@ bool HealthAssess::validateInput()
         ui->lineEdit_name->setFocus();
         return false;
     }
-    QRegExp nameReg("^[a-zA-Z\u4e00-\u9fa5·\\s]+$");
-    if (!nameReg.exactMatch(name)) {
+    QRegularExpression nameReg("^[a-zA-Z\u4e00-\u9fa5·\\s]+$");
+    if (!nameReg.match(name).hasMatch()) {
         QMessageBox::warning(this, "输入错误", "姓名包含无效字符");
         ui->lineEdit_name->setFocus();
         return false;
@@ -130,8 +131,8 @@ bool HealthAssess::validateInput()
         ui->lineEdit_phonenum->setFocus();
         return false;
     }
-    QRegExp phoneReg("^1[3-9]\\d{9}$");
-    if (!phoneReg.exactMatch(phone)) {
+    QRegularExpression phoneReg("^1[3-9]\\d{9}$");
+    if (!phoneReg.match(phone).hasMatch()) {
         QMessageBox::warning(this, "输入错误", "请输入有效的11位手机号");
         ui->lineEdit_phonenum->setFocus();
         return false;

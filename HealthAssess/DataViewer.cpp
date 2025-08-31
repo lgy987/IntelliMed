@@ -1,9 +1,11 @@
 #include "DataViewer.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFile>
 #include <QTextStream>
 #include <QDateTime>
 #include <QStandardPaths>
+
 
 DataViewer::DataViewer(DatabaseManager *dbManager, QWidget *parent)
     : QWidget(parent)

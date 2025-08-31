@@ -23,63 +23,78 @@
 
      <!-- Card widget for messages -->
      <item>
-       <widget class="QFrame" name="cardWidget">
+     <widget class="QFrame" name="cardWidget">
          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::NoFrame</enum>  <!-- remove border -->
          </property>
          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
+             <enum>QFrame::Plain</enum>
          </property>
          <layout class="QVBoxLayout" name="cardLayout">
+             <item>
+                 <widget class="QScrollArea" name="scrollArea">
+                     <property name="frameShape">
+                         <enum>QFrame::NoFrame</enum> <!-- remove scroll area border -->
+                     </property>
+                     <property name="widgetResizable">
+                         <bool>true</bool>
+                     </property>
+                     <widget class="QWidget" name="scrollAreaWidgetContents">
+                         <layout class="QVBoxLayout" name="messagesLayout">
+                             <item>
+                                 <spacer name="verticalSpacer">
+                                     <property name="orientation">
+                                         <enum>Qt::Vertical</enum>
+                                     </property>
+                                     <property name="sizeHint" stdset="0">
+                                         <size>
+                                             <width>20</width>
+                                             <height>40</height>
+                                         </size>
+                                     </property>
+                                 </spacer>
+                             </item>
+                         </layout>
+                     </widget>
+                 </widget>
+             </item>
 
-           <!-- Scrollable message history -->
-           <item>
-             <widget class="QScrollArea" name="scrollArea">
-               <property name="widgetResizable">
-                 <bool>true</bool>
-               </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents">
-                 <layout class="QVBoxLayout" name="messagesLayout">
-                   <item>
-                     <spacer name="verticalSpacer">
-                       <property name="orientation">
-                         <enum>Qt::Vertical</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                         <size>
-                           <width>20</width>
-                           <height>40</height>
-                         </size>
-                       </property>
-                     </spacer>
-                   </item>
+             <!-- Input + Send -->
+             <item>
+                 <layout class="QHBoxLayout" name="inputLayout">
+                     <item>
+                         <widget class="QLineEdit" name="messageEdit">
+                             <property name="placeholderText">
+                                 <string>输入消息...</string>
+                             </property>
+                             <property name="styleSheet">
+                                 <string notr="true">
+                                     QLineEdit {
+                                         border: 1px solid #d1d5db;
+                                         border-radius: 8px;
+                                         padding: 8px;
+                                         font-size: 14px;
+                                         background: #f9fafb;
+                                     }
+                                     QLineEdit:focus {
+                                         border: 1px solid #3b82f6;
+                                         background: #ffffff;
+                                     }
+                                 </string>
+                             </property>
+                         </widget>
+                     </item>
+                     <item>
+                         <widget class="QPushButton" name="sendButton">
+                             <property name="text">
+                                 <string>发送</string>
+                             </property>
+                         </widget>
+                     </item>
                  </layout>
-               </widget>
-             </widget>
-           </item>
-
-           <!-- Input + Send -->
-           <item>
-             <layout class="QHBoxLayout" name="inputLayout">
-               <item>
-                 <widget class="QLineEdit" name="messageEdit">
-                   <property name="placeholderText">
-                     <string>输入消息...</string>
-                   </property>
-                 </widget>
-               </item>
-               <item>
-                 <widget class="QPushButton" name="sendButton">
-                   <property name="text">
-                     <string>发送</string>
-                   </property>
-                 </widget>
-               </item>
-             </layout>
-           </item>
-
+             </item>
          </layout>
-       </widget>
+     </widget>
      </item>
 
    </layout>

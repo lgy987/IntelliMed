@@ -87,17 +87,28 @@
           </widget>
          </item>
          <item>
-          <layout class="QFormLayout" name="sessionFormLayout">
-           <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelSessionTime"><property name="text"><string>时间：</string></property></widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="sessionTimeEdit">
-             <property name="readOnly"><bool>true</bool></property>
-            </widget>
-           </item>
-          </layout>
+         <layout class="QFormLayout" name="sessionFormLayout">
+          <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
+          <property name="labelAlignment">
+           <set>Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="formAlignment">
+           <set>Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelSessionTime">
+            <property name="text"><string>时间：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="sessionTimeEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+         </layout>
          </item>
         </layout>
        </widget>
@@ -121,15 +132,67 @@
           <widget class="QLabel" name="patientHeader"><property name="text"><string>患者信息</string></property></widget>
          </item>
          <item>
-          <layout class="QFormLayout" name="patientFormLayout">
-           <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
-           <item row="0" column="0"><widget class="QLabel" name="labelPatientName"><property name="text"><string>姓名：</string></property></widget></item>
-           <item row="0" column="1"><widget class="QLineEdit" name="patientNameEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="1" column="0"><widget class="QLabel" name="labelPatientIdNumber"><property name="text"><string>身份证号：</string></property></widget></item>
-           <item row="1" column="1"><widget class="QLineEdit" name="patientIdNumberEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="2" column="0"><widget class="QLabel" name="labelPatientPhone"><property name="text"><string>手机号：</string></property></widget></item>
-           <item row="2" column="1"><widget class="QLineEdit" name="patientPhoneEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-          </layout>
+         <layout class="QFormLayout" name="patientFormLayout">
+          <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
+          <property name="labelAlignment">
+           <set>Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="formAlignment">
+           <set>Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelPatientName">
+            <property name="text"><string>姓名：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="patientNameEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelPatientSex">
+            <property name="text"><string>性别：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="patientSexEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelPatientAge">
+            <property name="text"><string>年龄：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="patientAgeEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+
+          <item row="3" column="0">
+           <widget class="QLabel" name="labelPatientPhone">
+            <property name="text"><string>手机号：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="patientPhoneEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+         </layout>
          </item>
          <item>
            <widget class="QPushButton" name="messageButton">
@@ -155,40 +218,6 @@
                <string>发送消息</string>
              </property>
            </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-
-      <!-- Doctor Card -->
-      <item>
-       <widget class="QFrame" name="doctorCard">
-        <property name="styleSheet">
-         <string notr="true">
-          QFrame { background:#ffffff; border-radius:16px; padding:16px; }
-          QLabel { font-size:14px; color:#374151; background:transparent; margin:0px; padding:0px; }
-          QLabel#doctorHeader { font-size:16px; font-weight:bold; margin-bottom:12px; }
-          QLineEdit { border:1px solid #d1d5db; border-radius:8px; padding:6px; font-size:14px; background:#f9fafb; }
-          QLineEdit:focus { border:1px solid #3b82f6; background:#ffffff; }
-          QLineEdit, QCheckBox { color: black; }
-         </string>
-        </property>
-        <layout class="QVBoxLayout" name="doctorLayout">
-         <item>
-          <widget class="QLabel" name="doctorHeader"><property name="text"><string>医生信息</string></property></widget>
-         </item>
-         <item>
-          <layout class="QFormLayout" name="doctorFormLayout">
-           <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
-           <item row="0" column="0"><widget class="QLabel" name="labelDoctorName"><property name="text"><string>姓名：</string></property></widget></item>
-           <item row="0" column="1"><widget class="QLineEdit" name="doctorNameEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="1" column="0"><widget class="QLabel" name="labelDoctorDepartment"><property name="text"><string>科室：</string></property></widget></item>
-           <item row="1" column="1"><widget class="QLineEdit" name="doctorDepartmentEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="2" column="0"><widget class="QLabel" name="labelDoctorTitle"><property name="text"><string>职称：</string></property></widget></item>
-           <item row="2" column="1"><widget class="QLineEdit" name="doctorTitleEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="3" column="0"><widget class="QLabel" name="labelDoctorDescription"><property name="text"><string>简介：</string></property></widget></item>
-           <item row="3" column="1"><widget class="QLineEdit" name="doctorDescriptionEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-          </layout>
          </item>
         </layout>
        </widget>

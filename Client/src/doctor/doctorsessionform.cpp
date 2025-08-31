@@ -1,6 +1,7 @@
 #include "doctorsessionform.h"
 #include "networkmanager.h"
 #include "ui_doctorsessionform.h"
+#include "personalinfoform.h"
 #include <QMessageBox>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -13,16 +14,6 @@ DoctorSessionForm::DoctorSessionForm(QWidget *parent)
     , currentIndex(0)
 {
     ui->setupUi(this);
-
-    // Disable editing of all fields
-    ui->sessionTimeEdit->setEnabled(false);
-    ui->patientNameEdit->setEnabled(false);
-    ui->patientIdNumberEdit->setEnabled(false);
-    ui->patientPhoneEdit->setEnabled(false);
-    ui->doctorNameEdit->setEnabled(false);
-    ui->doctorDepartmentEdit->setEnabled(false);
-    ui->doctorTitleEdit->setEnabled(false);
-    ui->doctorDescriptionEdit->setEnabled(false);
 
     // Connect NetworkManager signal
     connect(&NetworkManager::instance(), &NetworkManager::doctorSessionInfoResponse,
@@ -92,15 +83,21 @@ void DoctorSessionForm::showSession(int index)
     // Patient info
     QJsonObject patient = session["patient"].toObject();
     ui->patientNameEdit->setText(patient["name"].toString());
-    ui->patientIdNumberEdit->setText(patient["idNumber"].toString());
     ui->patientPhoneEdit->setText(patient["phone"].toString());
 
+    QString idStr = patient["idNumber"].toString();
+    std::pair<QString, QString> result =  PersonalInfoForm::parseIdStatic(idStr);
+    ui->patientSexEdit->setText(result.first);
+    ui->patientAgeEdit->setText(result.second);
+
     // Doctor info
+    /**
     QJsonObject doctor = session["doctor"].toObject();
     ui->doctorNameEdit->setText(doctor["name"].toString());
     ui->doctorDepartmentEdit->setText(doctor["department"].toString());
     ui->doctorTitleEdit->setText(doctor["title"].toString());
     ui->doctorDescriptionEdit->setText(doctor["description"].toString());
+    */
 
     // Enable/disable navigation buttons
     ui->prevButton->setEnabled(index > 0);

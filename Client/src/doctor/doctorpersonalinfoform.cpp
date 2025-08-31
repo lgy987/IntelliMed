@@ -8,8 +8,8 @@ DoctorPersonalInfoForm::DoctorPersonalInfoForm(QWidget *homepage, QWidget *paren
     : QWidget(parent), homepage(homepage), ui(new Ui::DoctorPersonalInfoForm)
 {
     ui->setupUi(this);
-    ui->usernameEdit->setEnabled(false);
-    ui->emailEdit->setEnabled(false);
+    //ui->usernameEdit->setEnabled(false);
+    //ui->emailEdit->setEnabled(false);
     //LoginForm::setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
     //LoginForm::setupInputValidation(ui->emailEdit, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,50}$)");
     LoginForm::setupInputValidation(ui->nameEdit, "^[\u4e00-\u9fa5·]{1,50}$");

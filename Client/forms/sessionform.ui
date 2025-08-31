@@ -49,122 +49,142 @@
    <item>
     <widget class="QWidget" name="cardsWidget">
      <layout class="QVBoxLayout" name="cardsLayout">
+     <!-- Session Card -->
+     <item>
+      <widget class="QFrame" name="sessionCard">
+       <property name="styleSheet">
+        <string notr="true">
+         QFrame { background: #ffffff; border-radius: 16px; padding: 16px; }
+         QLabel { font-size: 14px; color:#374151; background: transparent; margin: 0px; padding: 0px; }
+         QLabel#sessionHeader { font-size: 16px; font-weight:bold; margin-bottom:12px; }
+        </string>
+       </property>
+       <layout class="QVBoxLayout" name="sessionLayout">
+        <item>
+         <widget class="QLabel" name="sessionHeader">
+          <property name="text"><string>会诊信息</string></property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="sessionFormLayout">
+          <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
+          <property name="labelAlignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+          <property name="formAlignment"><set>Qt::AlignLeft|Qt::AlignTop</set></property>
 
-      <!-- Session Card -->
-      <item>
-       <widget class="QFrame" name="sessionCard">
-        <property name="styleSheet">
-         <string notr="true">
-          QFrame { background: #ffffff; border-radius: 16px; padding: 16px; }
-          QLabel { font-size: 14px; color:#374151; background: transparent; margin: 0px; padding: 0px; }
-          QLabel#sessionHeader { font-size: 16px; font-weight:bold; margin-bottom:12px; }
-          QLineEdit { border:1px solid #d1d5db; border-radius:8px; padding:6px; font-size:14px; background:#f9fafb; }
-          QLineEdit:focus { border:1px solid #3b82f6; background:#ffffff; }
-          QLineEdit, QCheckBox { color: black; }
-         </string>
-        </property>
-        <layout class="QVBoxLayout" name="sessionLayout">
-         <item>
-          <widget class="QLabel" name="sessionHeader"><property name="text"><string>会诊信息</string></property></widget>
-         </item>
-         <item>
-          <layout class="QFormLayout" name="sessionFormLayout">
-           <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
-           <item row="0" column="0"><widget class="QLabel" name="labelSessionTime"><property name="text"><string>时间：</string></property></widget></item>
-           <item row="0" column="1"><widget class="QLineEdit" name="sessionTimeEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-
-      <!-- Patient Card -->
-      <item>
-       <widget class="QFrame" name="patientCard">
-        <property name="styleSheet">
-         <string notr="true">
-          QFrame { background: #ffffff; border-radius:16px; padding:16px; }
-          QLabel { font-size:14px; color:#374151; background:transparent; margin:0px; padding:0px; }
-          QLabel#patientHeader { font-size:16px; font-weight:bold; margin-bottom:12px; }
-          QLineEdit { border:1px solid #d1d5db; border-radius:8px; padding:6px; font-size:14px; background:#f9fafb; }
-          QLineEdit:focus { border:1px solid #3b82f6; background:#ffffff; }
-          QLineEdit, QCheckBox { color: black; }
-         </string>
-        </property>
-        <layout class="QVBoxLayout" name="patientLayout">
-         <item><widget class="QLabel" name="patientHeader"><property name="text"><string>患者信息</string></property></widget></item>
-         <item>
-          <layout class="QFormLayout" name="patientFormLayout">
-           <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
-           <item row="0" column="0"><widget class="QLabel" name="labelPatientName"><property name="text"><string>姓名：</string></property></widget></item>
-           <item row="0" column="1"><widget class="QLineEdit" name="patientNameEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="1" column="0"><widget class="QLabel" name="labelPatientIdNumber"><property name="text"><string>身份证号：</string></property></widget></item>
-           <item row="1" column="1"><widget class="QLineEdit" name="patientIdNumberEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="2" column="0"><widget class="QLabel" name="labelPatientPhone"><property name="text"><string>手机号：</string></property></widget></item>
-           <item row="2" column="1"><widget class="QLineEdit" name="patientPhoneEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-
-      <!-- Doctor Card -->
-      <item>
-       <widget class="QFrame" name="doctorCard">
-        <property name="styleSheet">
-         <string notr="true">
-          QFrame { background:#ffffff; border-radius:16px; padding:16px; }
-          QLabel { font-size:14px; color:#374151; background:transparent; margin:0px; padding:0px; }
-          QLabel#doctorHeader { font-size:16px; font-weight:bold; margin-bottom:12px; }
-          QLineEdit { border:1px solid #d1d5db; border-radius:8px; padding:6px; font-size:14px; background:#f9fafb; }
-          QLineEdit:focus { border:1px solid #3b82f6; background:#ffffff; }
-          QLineEdit, QCheckBox { color: black; }
-         </string>
-        </property>
-        <layout class="QVBoxLayout" name="doctorLayout">
-         <item><widget class="QLabel" name="doctorHeader"><property name="text"><string>医生信息</string></property></widget></item>
-         <item>
-          <layout class="QFormLayout" name="doctorFormLayout">
-           <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
-           <item row="0" column="0"><widget class="QLabel" name="labelDoctorName"><property name="text"><string>姓名：</string></property></widget></item>
-           <item row="0" column="1"><widget class="QLineEdit" name="doctorNameEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="1" column="0"><widget class="QLabel" name="labelDoctorDepartment"><property name="text"><string>科室：</string></property></widget></item>
-           <item row="1" column="1"><widget class="QLineEdit" name="doctorDepartmentEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="2" column="0"><widget class="QLabel" name="labelDoctorTitle"><property name="text"><string>职称：</string></property></widget></item>
-           <item row="2" column="1"><widget class="QLineEdit" name="doctorTitleEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-           <item row="3" column="0"><widget class="QLabel" name="labelDoctorDescription"><property name="text"><string>简介：</string></property></widget></item>
-           <item row="3" column="1"><widget class="QLineEdit" name="doctorDescriptionEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
-          </layout>
-         </item>
-         <item>
-           <widget class="QPushButton" name="messageButton">
-             <property name="styleSheet">
-               <string notr="true">
-                 QPushButton {
-                   background: #d1d5db;
-                   color: #111827;
-                   border-radius: 8px;
-                   padding: 10px;
-                   font-weight: bold;
-                 }
-                 QPushButton:hover:!disabled {
-                   background-color: #9ca3af;
-                 }
-                 QPushButton:disabled {
-                   background-color: #e5e7eb;
-                   color: #6b7280;
-                 }
-               </string>
-             </property>
-             <property name="text">
-               <string>发送消息</string>
-             </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelSessionTime">
+            <property name="text"><string>时间：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
            </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="sessionTimeEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
 
+     <!-- Doctor Card -->
+     <item>
+      <widget class="QFrame" name="doctorCard">
+       <property name="styleSheet">
+        <string notr="true">
+         QFrame { background:#ffffff; border-radius:16px; padding:16px; }
+         QLabel { font-size:14px; color:#374151; background:transparent; margin:0px; padding:0px; }
+         QLabel#doctorHeader { font-size:16px; font-weight:bold; margin-bottom:12px; }
+        </string>
+       </property>
+       <layout class="QVBoxLayout" name="doctorLayout">
+        <item>
+         <widget class="QLabel" name="doctorHeader">
+          <property name="text"><string>医生信息</string></property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="doctorFormLayout">
+          <property name="fieldGrowthPolicy"><enum>QFormLayout::ExpandingFieldsGrow</enum></property>
+          <property name="labelAlignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+          <property name="formAlignment"><set>Qt::AlignLeft|Qt::AlignTop</set></property>
+
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelDoctorName">
+            <property name="text"><string>姓名：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="doctorNameEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelDoctorDepartment">
+            <property name="text"><string>科室：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="doctorDepartmentEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelDoctorTitle">
+            <property name="text"><string>职称：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="doctorTitleEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+
+          <item row="3" column="0">
+           <widget class="QLabel" name="labelDoctorDescription">
+            <property name="text"><string>简介：</string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="doctorDescriptionEdit">
+            <property name="text"><string></string></property>
+            <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="messageButton">
+          <property name="styleSheet">
+           <string notr="true">
+            QPushButton {
+              background: #d1d5db;
+              color: #111827;
+              border-radius: 8px;
+              padding: 10px;
+              font-weight: bold;
+            }
+            QPushButton:hover:!disabled { background-color: #9ca3af; }
+            QPushButton:disabled { background-color: #e5e7eb; color: #6b7280; }
+           </string>
+          </property>
+          <property name="text"><string>发送消息</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
      </layout>
     </widget>
    </item>

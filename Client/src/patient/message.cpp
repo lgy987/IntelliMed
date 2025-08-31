@@ -15,6 +15,35 @@ Message::Message(int partnerId, bool isDoctor, QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->sendButton->setObjectName("sendButton");
+    if (!isDoctor) {
+        ui->sendButton->setStyleSheet(R"(
+        #sendButton {
+        background-color: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-size: 14px;
+        }
+        #sendButton:hover {
+            background-color: #1d4ed8;
+        }
+        )");
+    } else {
+        ui->sendButton->setStyleSheet(R"(
+        #sendButton {
+        background-color: #06b6d4;
+            color: white;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-size: 14px;
+        }
+        #sendButton:hover {
+            background-color: #1d4ed8;
+        }
+        )");
+    }
+
     // Connect send button
     connect(ui->sendButton, &QPushButton::clicked, this, &Message::onSendButtonClicked);
 
@@ -49,22 +78,61 @@ void Message::loadMessages()
 // Append a single message bubble
 void Message::appendMessage(const QString &senderType, const QString &text, const QString &timestamp)
 {
-    QLabel *msgLabel = new QLabel(this);
-    msgLabel->setWordWrap(true);
-    msgLabel->setText(QString("[%1] %2").arg(timestamp, text));
+    QLabel *msgLabel = new QLabel(text);
 
+    bool isFromSelf = false;
     if ((!m_isDoctor && senderType == "patient") || (m_isDoctor && senderType == "doctor")) {
+        isFromSelf = true;
         msgLabel->setStyleSheet("background:#d1d5db; color:#111827; padding:8px; border-radius:8px; max-width:300px;");
         msgLabel->setAlignment(Qt::AlignRight);
     } else if (m_isDoctor && senderType == "patient"){
         msgLabel->setStyleSheet("background: #06b6d4; color:white; padding:8px; border-radius:8px; max-width:300px;");
-        msgLabel->setAlignment(Qt::AlignRight);
+        msgLabel->setAlignment(Qt::AlignLeft);
     }else {
         msgLabel->setStyleSheet("background:#3b82f6; color:white; padding:8px; border-radius:8px; max-width:300px;");
         msgLabel->setAlignment(Qt::AlignLeft);
     }
 
-    ui->messagesLayout->insertWidget(ui->messagesLayout->count() - 1, msgLabel);
+    QWidget *container = new QWidget;
+    QVBoxLayout *vLayout = new QVBoxLayout(container);
+    vLayout->setContentsMargins(0, 0, 0, 0);
+
+    // Timestamp
+    QLabel *timeLabel = new QLabel(timestamp);
+    timeLabel->setStyleSheet("font-size:10px; color:gray;");
+    timeLabel->setAlignment(isFromSelf ? Qt::AlignRight : Qt::AlignLeft);
+    vLayout->addWidget(timeLabel);
+
+    // Message bubble
+    msgLabel->setWordWrap(true);
+    msgLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+    // Let Qt determine height automatically based on width
+    int maxWidth = 400;
+    msgLabel->setMaximumWidth(maxWidth);
+
+    // Optional: calculate width dynamically but allow wrapping
+    QFontMetrics fm(msgLabel->font());
+    int textWidth = fm.boundingRect(msgLabel->text()).width() + 20; // + padding
+    msgLabel->setMinimumWidth(qMin(textWidth, maxWidth));
+
+    // Let the height adjust naturally
+    msgLabel->adjustSize();
+
+    vLayout->addWidget(msgLabel);
+
+    // Bubble alignment in HBox
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    if (isFromSelf) {
+        hLayout->addStretch();
+        hLayout->addWidget(container);
+    } else {
+        hLayout->addWidget(container);
+        hLayout->addStretch();
+    }
+
+    // Add to main messages layout
+    ui->messagesLayout->insertLayout(ui->messagesLayout->count() - 1, hLayout);
 
     // Auto scroll to bottom
     QScrollBar *scrollBar = ui->scrollArea->verticalScrollBar();
@@ -104,8 +172,18 @@ void Message::onGetMessages(const QJsonObject &obj)
         QJsonObject msgObj = messages.at(i).toObject();
 
         qint64 ms = msgObj.value("timestamp").toVariant().toLongLong();
-        QDateTime dt = QDateTime::fromMSecsSinceEpoch(ms); // UTC
-        QString localTimeStr = dt.toLocalTime().toString("yyyy-MM-dd hh:mm:ss");
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(ms).toLocalTime();
+
+        QString localTimeStr;
+        QDate today = QDate::currentDate();
+
+        if (dt.date() == today) {
+            // Today → show only hours:minutes
+            localTimeStr = dt.toString("hh:mm");
+        } else {
+            // Before today → show date
+            localTimeStr = dt.toString("yy-MM-dd");
+        }
 
         appendMessage(msgObj.value("sender_type").toString(),
                       msgObj.value("message").toString(),
@@ -120,7 +198,7 @@ void Message::onSendMessageAck(const QJsonObject &obj)
     if (obj.value("status").toString() != "success") return;
 
     // Generate local timestamp
-    QString localTimestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    QString localTimestamp = QDateTime::currentDateTime().toString("hh:mm");
 
     appendMessage(obj.value("sender_type").toString(),
                   obj.value("message").toString(),

@@ -10,15 +10,6 @@ SessionForm::SessionForm(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->sessionTimeEdit->setEnabled(false);
-    ui->patientNameEdit->setEnabled(false);
-    ui->patientIdNumberEdit->setEnabled(false);
-    ui->patientPhoneEdit->setEnabled(false);
-    ui->doctorNameEdit->setEnabled(false);
-    ui->doctorDepartmentEdit->setEnabled(false);
-    ui->doctorTitleEdit->setEnabled(false);
-    ui->doctorDescriptionEdit->setEnabled(false);
-
     // Connect NetworkManager signal
     connect(&NetworkManager::instance(), &NetworkManager::sessionInfoResponse,
             this, &SessionForm::onSessionInfoReceived);
@@ -44,10 +35,12 @@ void SessionForm::onSessionInfoReceived(const QJsonObject &reply)
             ui->sessionTimeEdit->setText(reply["time"].toString());
 
             // Patient info
+            /**
             QJsonObject patient = reply["patient"].toObject();
             ui->patientNameEdit->setText(patient["name"].toString());
             ui->patientIdNumberEdit->setText(patient["idNumber"].toString());
             ui->patientPhoneEdit->setText(patient["phone"].toString());
+            */
 
             // Doctor info
             QJsonObject doctor = reply["doctor"].toObject();

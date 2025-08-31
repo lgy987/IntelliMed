@@ -953,7 +953,7 @@ QString Server::generateToken() {
     QByteArray randomBytes = QUuid::createUuid().toByteArray();
     QString token = QCryptographicHash::hash(randomBytes, QCryptographicHash::Sha256).toHex();
     return token;
-}  // member
+}
 
 
 QJsonObject Server::forwardDoctorAdviceRequest(const QJsonObject &actionRequest) {

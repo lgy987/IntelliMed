@@ -29,6 +29,10 @@ public:
     void sendGetSessionInfo();
     void sendDoctorGetSessionInfo();
     void sendDoctorEndSession(int sessionId);
+    void getMessages(int partnerId);
+    void doctorGetMessages(int partnerId);
+    void sendMessage(int partnerId, const QString &message);
+    void doctorSendMessage(int partnerId, const QString &message);
 
 signals:
     void loginResponse(const QJsonObject &obj);
@@ -40,6 +44,8 @@ signals:
     void sessionInfoResponse(const QJsonObject &obj);
     void doctorSessionInfoResponse(const QJsonObject &obj);
     void doctorEndSessionResponse(const QJsonObject &reply);
+    void getMessagesResponse(const QJsonObject &obj);
+    void sendMessageResponse(const QJsonObject &obj);
 
 private slots:
     void onReadyRead();

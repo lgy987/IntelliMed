@@ -24,13 +24,16 @@ private slots:
     void endCurrentSession();
     void handleEndSessionResponse(const QJsonObject &reply);
 
+signals:
+    void startMessage(int partnerId);
+
 private:
     void showSession(int index);
     void updateSessionUI();
 
 private:
     Ui::DoctorSessionForm *ui;
-
+    int m_partnerId;
     QList<QJsonObject> sessions;  // Stores all sessions of the doctor
     int currentIndex;             // Current session being displayed
 };

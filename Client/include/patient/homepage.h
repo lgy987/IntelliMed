@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include "sessionform.h"
+#include "message.h"
 
 namespace Ui {
 class HomePage;
@@ -20,11 +22,16 @@ public:
 private:
     Ui::HomePage *ui;
     QWidget *loginForm;
+
+    SessionForm *sform = nullptr;
+    Message *msg = nullptr;
+
     void handlePersonalInfoClicked();
     void setupButtons();
     QList<QPushButton*> buttons;
     void setupPersonalInfoForm();
     void setupSessionForm();
+    void setupMessage();
 };
 
 #endif // HOMEPAGE_H

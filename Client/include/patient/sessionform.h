@@ -18,9 +18,13 @@ public:
 private slots:
     void onSessionInfoReceived(const QJsonObject &reply);
 
+signals:
+    void startMessage(int partnerId);
+
 private:
     Ui::SessionForm *ui;
     void updateSessionUI();
+    int m_partnerId;
 };
 
 #endif // SESSIONFORM_H

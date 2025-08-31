@@ -1,0 +1,87 @@
+<ui version="4.0">
+ <class>Message</class>
+ <widget class="QWidget" name="Message">
+   <layout class="QVBoxLayout">
+
+     <!-- Warning message -->
+     <item>
+       <widget class="QLabel" name="warningLabel">
+         <property name="text">
+           <string>没有正在进行的对话，请前往当前会诊发起对话。</string>
+         </property>
+         <property name="visible">
+           <bool>false</bool>
+         </property>
+         <property name="alignment">
+           <set>Qt::AlignCenter</set>
+         </property>
+         <property name="styleSheet">
+           <string notr="true">QLabel { font-size:16px; color:#6b7280; }</string>
+         </property>
+       </widget>
+     </item>
+
+     <!-- Card widget for messages -->
+     <item>
+       <widget class="QFrame" name="cardWidget">
+         <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="cardLayout">
+
+           <!-- Scrollable message history -->
+           <item>
+             <widget class="QScrollArea" name="scrollArea">
+               <property name="widgetResizable">
+                 <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <layout class="QVBoxLayout" name="messagesLayout">
+                   <item>
+                     <spacer name="verticalSpacer">
+                       <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                         <size>
+                           <width>20</width>
+                           <height>40</height>
+                         </size>
+                       </property>
+                     </spacer>
+                   </item>
+                 </layout>
+               </widget>
+             </widget>
+           </item>
+
+           <!-- Input + Send -->
+           <item>
+             <layout class="QHBoxLayout" name="inputLayout">
+               <item>
+                 <widget class="QLineEdit" name="messageEdit">
+                   <property name="placeholderText">
+                     <string>输入消息...</string>
+                   </property>
+                 </widget>
+               </item>
+               <item>
+                 <widget class="QPushButton" name="sendButton">
+                   <property name="text">
+                     <string>发送</string>
+                   </property>
+                 </widget>
+               </item>
+             </layout>
+           </item>
+
+         </layout>
+       </widget>
+     </item>
+
+   </layout>
+ </widget>
+</ui>

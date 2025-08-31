@@ -2,6 +2,7 @@
 #include "ui_homepage.h"
 #include "personalinfoform.h"
 #include "sessionform.h"
+#include "message.h"
 #include "session.h"
 
 HomePage::HomePage(QWidget *loginForm, QWidget *parent)
@@ -13,6 +14,7 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     setupButtons();
     setupPersonalInfoForm();
     setupSessionForm();
+    setupMessage();
     QVBoxLayout* sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -51,11 +53,25 @@ void HomePage::setupPersonalInfoForm()
 
 void HomePage::setupSessionForm()
 {
-    SessionForm* sform = new SessionForm(this);
+    sform = new SessionForm(this);
     // Add it to the stacked page layout
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(1));
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(sform);
+
+    connect(sform, &SessionForm::startMessage, this, [=](int partnerId){
+        msg->changePartner(partnerId);
+        ui->btnCases->click();
+    });
+}
+
+void HomePage::setupMessage()
+{
+    msg = new Message(-1, false, this);
+    // Add it to the stacked page layout
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(2));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(msg);
 }
 
 void HomePage::setupButtons()
@@ -105,3 +121,4 @@ void HomePage::setupButtons()
     // Activate first page by default
     buttons[0]->click();
 }
+

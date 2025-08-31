@@ -13,6 +13,7 @@ DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     setupButtons();
     setupPersonalInfoForm();
     setupSessionForm();
+    setupMessage();
     QVBoxLayout *sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -51,11 +52,25 @@ void DoctorHomePage::setupPersonalInfoForm()
 
 void DoctorHomePage::setupSessionForm()
 {
-    DoctorSessionForm* sform = new DoctorSessionForm(this);
+    dsform = new DoctorSessionForm(this);
     // Add it to the stacked page layout
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(1));
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(sform);
+    layout->addWidget(dsform);
+
+    connect(dsform, &DoctorSessionForm::startMessage, this, [=](int partnerId){
+        msg->changePartner(partnerId);
+        ui->btnCases->click();
+    });
+}
+
+void DoctorHomePage::setupMessage()
+{
+    msg = new Message(-1, true, this);
+    // Add it to the stacked page layout
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(2));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(msg);
 }
 
 void DoctorHomePage::setupButtons()

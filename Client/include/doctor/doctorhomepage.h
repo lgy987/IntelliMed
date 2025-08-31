@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QPushButton>
 
+#include "doctorsessionform.h"
+#include "message.h"
+
 namespace Ui {
 class DoctorHomePage;
 }
@@ -18,6 +21,8 @@ public:
     void handleLogout();
 
 private:
+    DoctorSessionForm *dsform = nullptr;
+    Message *msg = nullptr;
     Ui::DoctorHomePage *ui;
     QWidget *dloginForm;
     void handlePersonalInfoClicked();
@@ -25,6 +30,7 @@ private:
     QList<QPushButton*> buttons;
     void setupPersonalInfoForm();
     void setupSessionForm();
+    void setupMessage();
 };
 
 #endif // HOMEPAGE_H

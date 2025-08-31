@@ -6,6 +6,7 @@
 SessionForm::SessionForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::SessionForm)
+    , m_partnerId(-1)
 {
     ui->setupUi(this);
 
@@ -21,6 +22,9 @@ SessionForm::SessionForm(QWidget *parent)
     // Connect NetworkManager signal
     connect(&NetworkManager::instance(), &NetworkManager::sessionInfoResponse,
             this, &SessionForm::onSessionInfoReceived);
+    connect(ui->messageButton, &QPushButton::clicked,this, [this]() {
+        emit startMessage(m_partnerId);
+    });
 
     NetworkManager::instance().sendGetSessionInfo();
 }
@@ -54,6 +58,7 @@ void SessionForm::onSessionInfoReceived(const QJsonObject &reply)
 
             ui->cardsWidget->setVisible(true);
             ui->noSessionLabel->setVisible(false);
+            m_partnerId = doctor["id"].toInt();
         } else {
             ui->cardsWidget->setVisible(false);
             ui->noSessionLabel->setVisible(true);

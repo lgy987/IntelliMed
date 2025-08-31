@@ -28,6 +28,7 @@ SOURCES += \
     src/patient/session.cpp \
     src/patient/signupform.cpp \
     src/patient/sessionform.cpp \
+    src/patient/message.cpp \
     src/doctor/doctorsessionform.cpp \
     src/network/networkmanager.cpp
 
@@ -45,7 +46,8 @@ HEADERS += \
     include/patient/session.h \
     include/patient/sessionform.h \
     include/patient/signupform.h \
-    include/network/networkmanager.h
+    include/patient/message.h \
+    include/network/networkmanager.h \
 
 # Forms
 FORMS += \
@@ -58,7 +60,8 @@ FORMS += \
     forms/personalinfoform.ui \
     forms/signupform.ui \
     forms/sessionform.ui \
-    forms/doctorsessionform.ui
+    forms/doctorsessionform.ui \
+    forms/message.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

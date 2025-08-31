@@ -40,4 +40,8 @@ private:
     QJsonObject handleDoctorGetSessionInfo(const QJsonObject &request);
     QJsonObject handleEndSession(const QJsonObject &request);
     int checkDoctorToken(const QString &token);
+
+    QJsonObject handleGetMessages(const QJsonObject &request);
+    QJsonObject handleSendMessage(const QJsonObject &request);
+
 };

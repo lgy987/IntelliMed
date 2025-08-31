@@ -131,6 +131,31 @@
            <item row="2" column="1"><widget class="QLineEdit" name="patientPhoneEdit"><property name="readOnly"><bool>true</bool></property></widget></item>
           </layout>
          </item>
+         <item>
+           <widget class="QPushButton" name="messageButton">
+             <property name="styleSheet">
+               <string notr="true">
+                 QPushButton {
+                   background: #d1d5db;
+                   color: #111827;
+                   border-radius: 8px;
+                   padding: 10px;
+                   font-weight: bold;
+                 }
+                 QPushButton:hover:!disabled {
+                   background-color: #9ca3af;
+                 }
+                 QPushButton:disabled {
+                   background-color: #e5e7eb;
+                   color: #6b7280;
+                 }
+               </string>
+             </property>
+             <property name="text">
+               <string>发送消息</string>
+             </property>
+           </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -184,18 +209,58 @@
 
       <!-- Navigation -->
       <item>
-       <layout class="QHBoxLayout" name="navLayout">
-        <item>
-         <widget class="QPushButton" name="prevButton">
-          <property name="text"><string>上一页</string></property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="nextButton">
-          <property name="text"><string>下一页</string></property>
-         </widget>
-        </item>
-       </layout>
+        <layout class="QHBoxLayout" name="navLayout">
+          <item>
+            <widget class="QPushButton" name="prevButton">
+              <property name="styleSheet">
+                <string notr="true">
+                  QPushButton {
+                    background: #d1d5db;
+                    color: #111827;
+                    border-radius: 8px;
+                    padding: 10px;
+                    font-weight: bold;
+                  }
+                  QPushButton:hover:!disabled {
+                    background-color: #9ca3af;
+                  }
+                  QPushButton:disabled {
+                    background-color: #e5e7eb;
+                    color: #6b7280;
+                  }
+                </string>
+              </property>
+              <property name="text">
+                <string>上一页</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="nextButton">
+              <property name="styleSheet">
+                <string notr="true">
+                  QPushButton {
+                    background: #d1d5db;
+                    color: #111827;
+                    border-radius: 8px;
+                    padding: 10px;
+                    font-weight: bold;
+                  }
+                  QPushButton:hover:!disabled {
+                    background-color: #9ca3af;
+                  }
+                  QPushButton:disabled {
+                    background-color: #e5e7eb;
+                    color: #6b7280;
+                  }
+                </string>
+              </property>
+              <property name="text">
+                <string>下一页</string>
+              </property>
+            </widget>
+          </item>
+        </layout>
       </item>
 
      </layout>

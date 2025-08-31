@@ -86,6 +86,10 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
         return handleDoctorGetSessionInfo(request);
     } else if (action == "endSession") {
         return handleEndSession(request);
+    } else if (action == "getMessages") {
+        return handleGetMessages(request);
+    } else if (action == "sendMessage") {
+        return handleSendMessage(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -543,6 +547,8 @@ QJsonObject Server::handleGetSessionInfo(const QJsonObject &request) {
     QSqlQuery query;
     query.prepare(R"(
     SELECT s.id AS sessionId, s.time,
+           s.patientId AS patientId,
+           s.doctorId AS doctorId,
 
            -- Patient info
            pi.name         AS patientName,
@@ -572,6 +578,7 @@ QJsonObject Server::handleGetSessionInfo(const QJsonObject &request) {
 
         // Patient info
         QJsonObject patient;
+        patient["id"]      = query.value("patientId").toInt();
         patient["name"]      = query.value("patientName").toString();
         patient["idNumber"]  = query.value("patientIdNumber").toString();
         patient["phone"]     = query.value("patientPhone").toString();
@@ -579,6 +586,7 @@ QJsonObject Server::handleGetSessionInfo(const QJsonObject &request) {
 
         // Doctor info
         QJsonObject doctor;
+        doctor["id"]         = query.value("doctorId").toInt();
         doctor["name"]        = query.value("doctorName").toString();
         doctor["department"]  = query.value("doctorDepartment").toString();
         doctor["title"]       = query.value("doctorTitle").toString();
@@ -609,6 +617,8 @@ QJsonObject Server::handleDoctorGetSessionInfo(const QJsonObject &request) {
     QSqlQuery query;
     query.prepare(R"(
         SELECT s.id AS sessionId, s.time,
+               s.patientId AS patientId,
+               s.doctorId AS doctorId,
                pi.name        AS patientName,
                pi.id_number   AS patientIdNumber,
                pi.phone_number AS patientPhone,
@@ -636,6 +646,7 @@ QJsonObject Server::handleDoctorGetSessionInfo(const QJsonObject &request) {
 
             // Patient info
             QJsonObject patient;
+            patient["id"]      = query.value("patientId").toInt();
             patient["name"]       = query.value("patientName").toString();
             patient["idNumber"]   = query.value("patientIdNumber").toString();
             patient["phone"]      = query.value("patientPhone").toString();
@@ -643,6 +654,7 @@ QJsonObject Server::handleDoctorGetSessionInfo(const QJsonObject &request) {
 
             // Doctor info
             QJsonObject doctor;
+            doctor["id"]         = query.value("doctorId").toInt();
             doctor["name"]        = query.value("doctorName").toString();
             doctor["department"]  = query.value("doctorDepartment").toString();
             doctor["title"]       = query.value("doctorTitle").toString();
@@ -726,6 +738,136 @@ QJsonObject Server::handleEndSession(const QJsonObject &request) {
 
     return reply;
 }
+
+QJsonObject Server::handleGetMessages(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "getMessages";
+
+    // Step 1: Authenticate patient
+    QString token = request["token"].toString();
+    int patientId = checkToken(token);
+    int doctorId;
+    if (patientId <= 0) {
+        doctorId = checkDoctorToken(token);
+        if (doctorId <= 0) {
+            reply["status"] = "error";
+            reply["message"] = "无效的token，请重新登录";
+            return reply;
+        } else {
+            patientId = request["partner_id"].toInt();
+        }
+    } else {
+        doctorId = request["partner_id"].toInt();
+    }
+
+    if (doctorId <= 0 || patientId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的ID";
+        return reply;
+    }
+
+    // Step 2: Query messages
+    QSqlQuery query;
+    query.prepare("SELECT sender_type, message, timestamp "
+                  "FROM messages "
+                  "WHERE doctor_id = :doctorId AND patient_id = :patientId "
+                  "ORDER BY timestamp ASC");
+    query.bindValue(":doctorId", doctorId);
+    query.bindValue(":patientId", patientId);
+
+    if (!query.exec()) {
+        reply["status"] = "error";
+        reply["message"] = "数据库查询失败: " + query.lastError().text();
+        return reply;
+    }
+
+    // Step 3: Collect messages
+    QJsonArray messages;
+    while (query.next()) {
+        QJsonObject msg;
+        msg["sender_type"] = query.value("sender_type").toString();
+        msg["message"] = query.value("message").toString();
+        QDateTime dt = query.value("timestamp").toDateTime();
+        msg["timestamp"] = dt.toMSecsSinceEpoch();
+        messages.append(msg);
+    }
+
+    reply["status"] = "success";
+    reply["messages"] = messages;
+    return reply;
+}
+
+QJsonObject Server::handleSendMessage(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "sendMessage";
+
+    QString token = request["token"].toString();
+    QString messageText = request["message"].toString();
+    if (messageText.isEmpty()) {
+        reply["status"] = "error";
+        reply["message"] = "消息不能为空";
+        return reply;
+    }
+
+    int patientId = checkToken(token);
+    int doctorId = -1;
+    QString senderType;
+
+    if (patientId > 0) {
+        // Sender is patient
+        doctorId = request["partner_id"].toInt();
+        senderType = "patient";
+    } else {
+        // Try doctor
+        doctorId = checkDoctorToken(token);
+        if (doctorId > 0) {
+            patientId = request["partner_id"].toInt();
+            senderType = "doctor";
+        } else {
+            reply["status"] = "error";
+            reply["message"] = "无效的token，请重新登录";
+            return reply;
+        }
+    }
+
+    if (doctorId <= 0 || patientId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的ID";
+        return reply;
+    }
+
+    // Insert message into database
+    QSqlQuery query;
+    query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
+                  "VALUES (:doctorId, :patientId, :senderType, :message)");
+    query.bindValue(":doctorId", doctorId);
+    query.bindValue(":patientId", patientId);
+    query.bindValue(":senderType", senderType);
+    query.bindValue(":message", messageText);
+
+    if (!query.exec()) {
+        reply["status"] = "error";
+        reply["message"] = "消息发送失败: " + query.lastError().text();
+        return reply;
+    }
+
+    reply["status"] = "success";
+    reply["sender_type"] = senderType;
+    reply["message"] = messageText;
+
+    // Optional: Notify recipient immediately
+    // If you have a connected socket map: e.g., patientSockets[patientId] or doctorSockets[doctorId]
+    // you could do something like:
+    // if (senderType == "doctor" && patientSockets.contains(patientId)) {
+    //     patientSockets[patientId]->send(reply); // pseudo code
+    // }
+    // else if (senderType == "patient" && doctorSockets.contains(doctorId)) {
+    //     doctorSockets[doctorId]->send(reply);
+    // }
+
+    return reply;
+}
+
 
 QString Server::generateToken() {
     QByteArray randomBytes = QUuid::createUuid().toByteArray();

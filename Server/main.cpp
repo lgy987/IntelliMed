@@ -81,6 +81,19 @@ bool initDatabase() {
         return false;
     }
 
+    if (!query.exec("CREATE TABLE IF NOT EXISTS messages ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "doctor_id INTEGER NOT NULL,"
+                    "patient_id INTEGER NOT NULL,"
+                    "sender_type TEXT CHECK(sender_type IN ('patient','doctor')) NOT NULL,"
+                    "message TEXT NOT NULL,"
+                    "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                    "FOREIGN KEY(doctor_id) REFERENCES doctors(id),"
+                    "FOREIGN KEY(patient_id) REFERENCES users(id))")) {
+        qCritical() << "Failed to create messages table:" << query.lastError();
+        return false;
+    }
+
     return true;
 }
 

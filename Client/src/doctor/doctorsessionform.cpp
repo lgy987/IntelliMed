@@ -9,6 +9,7 @@
 DoctorSessionForm::DoctorSessionForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DoctorSessionForm)
+    , m_partnerId(-1)
     , currentIndex(0)
 {
     ui->setupUi(this);
@@ -33,6 +34,9 @@ DoctorSessionForm::DoctorSessionForm(QWidget *parent)
     connect(ui->prevButton, &QPushButton::clicked, this, &DoctorSessionForm::showPreviousSession);
     connect(ui->nextButton, &QPushButton::clicked, this, &DoctorSessionForm::showNextSession);
     connect(ui->endSessionButton, &QPushButton::clicked, this, &DoctorSessionForm::endCurrentSession);
+    connect(ui->messageButton, &QPushButton::clicked,this, [this]() {
+        emit startMessage(m_partnerId);
+    });
 
     // Request all sessions for the doctor
     NetworkManager::instance().sendDoctorGetSessionInfo();
@@ -101,6 +105,8 @@ void DoctorSessionForm::showSession(int index)
     // Enable/disable navigation buttons
     ui->prevButton->setEnabled(index > 0);
     ui->nextButton->setEnabled(index < sessions.size() - 1);
+
+    m_partnerId = patient["id"].toInt();
 }
 
 void DoctorSessionForm::showPreviousSession()

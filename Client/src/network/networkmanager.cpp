@@ -179,6 +179,52 @@ void NetworkManager::sendDoctorEndSession(int sessionId)
     socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
 }
 
+void NetworkManager::getMessages(int partnerId)
+{
+    QJsonObject req;
+    req["action"] = "getMessages";
+    req["token"] = Session::instance().token(); // or DoctorSession::instance().token() depending on user type
+    req["partner_id"] = partnerId;
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void NetworkManager::doctorGetMessages(int partnerId)
+{
+    QJsonObject req;
+    req["action"] = "getMessages";
+    req["token"] = DoctorSession::instance().token(); // or DoctorSession::instance().token() depending on user type
+    req["partner_id"] = partnerId;
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void NetworkManager::sendMessage(int partnerId, const QString &message)
+{
+    QJsonObject req;
+    req["action"] = "sendMessage";
+    req["token"] = Session::instance().token(); // or DoctorSession::instance().token()
+    req["partner_id"] = partnerId;
+    req["message"] = message;
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void NetworkManager::doctorSendMessage(int partnerId, const QString &message)
+{
+    QJsonObject req;
+    req["action"] = "sendMessage";
+    req["token"] = DoctorSession::instance().token();
+    req["partner_id"] = partnerId;
+    req["message"] = message;
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
 void NetworkManager::onReadyRead()
 {
     while (socket->canReadLine()) {
@@ -207,6 +253,10 @@ void NetworkManager::onReadyRead()
             emit doctorSessionInfoResponse(obj);
         } else if (action == "endSession") {
             emit doctorEndSessionResponse(obj);
+        } else if (action == "getMessages") {
+            emit getMessagesResponse(obj);
+        } else if (action == "sendMessage") {
+            emit sendMessageResponse(obj);
         }
     }
 }

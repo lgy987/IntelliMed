@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "doctoradviceserver.h"
+#include <QDebug>
 
 Server::Server(QObject *parent) : QTcpServer(parent) {
     if (!listen(QHostAddress::Any, 12345)) {
@@ -17,6 +18,7 @@ Server::Server(QObject *parent) : QTcpServer(parent) {
     //doctorAdviceServer.start();
 }
 
+/**
 void Server::incomingConnection(qintptr socketDescriptor) {
     QTcpSocket *client = new QTcpSocket(this);
     client->setSocketDescriptor(socketDescriptor);
@@ -26,8 +28,29 @@ void Server::incomingConnection(qintptr socketDescriptor) {
     connect(client, &QTcpSocket::disconnected, this, &Server::onDisconnected);
 
     qDebug() << "New client connected:" << socketDescriptor;
+}*/
+
+void Server::incomingConnection(qintptr socketDescriptor) {
+    // Create new TCP client socket
+    QTcpSocket *client = new QTcpSocket(this);
+    if (!client->setSocketDescriptor(socketDescriptor)) {
+        qWarning() << "Failed to set socket descriptor for client" << socketDescriptor;
+        client->deleteLater();
+        return;
+    }
+
+    // Generate a temporary token for this connection (can be replaced by login token later)
+    QString tempToken = QString("temp_%1").arg(socketDescriptor);
+    clients[tempToken] = client; // clientsMap: QHash<QString, QTcpSocket*>
+
+    // Connect signals
+    connect(client, &QTcpSocket::readyRead, this, &Server::onReadyRead);
+    connect(client, &QTcpSocket::disconnected, this, &Server::onDisconnected);
+
+    qDebug() << "New client connected:" << socketDescriptor << ", temp token:" << tempToken;
 }
 
+/**
 void Server::onReadyRead() {
     QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
     if (!client) return;
@@ -42,6 +65,20 @@ void Server::onReadyRead() {
 
         sendResponse(client, reply);
     }
+}*/
+
+void Server::onReadyRead() {
+    QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
+    while (client->canReadLine()) {
+        QByteArray line = client->readLine().trimmed();
+        QJsonDocument doc = QJsonDocument::fromJson(line);
+        if (!doc.isObject()) continue;
+
+        QJsonObject request = doc.object();
+        QJsonObject reply = handleAction(client, request);
+
+        sendResponse(client, reply);
+    }
 }
 
 // Send a JSON reply to client
@@ -50,6 +87,7 @@ void Server::sendResponse(QTcpSocket *client, const QJsonObject &reply) {
     client->write(responseDoc.toJson(QJsonDocument::Compact) + "\n");
 }
 
+/**
 void Server::onDisconnected() {
     QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
     if (client) {
@@ -57,15 +95,22 @@ void Server::onDisconnected() {
         client->deleteLater();
         qDebug() << "Client disconnected.";
     }
+}*/
+
+void Server::onDisconnected() {
+    QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
+    QString key = clients.key(client);
+    if (!key.isEmpty()) clients.remove(key);
+    client->deleteLater();
 }
 
 // Handle different actions based on request
-QJsonObject Server::handleAction(const QJsonObject &request) {
+QJsonObject Server::handleAction(QTcpSocket* client, const QJsonObject &request) {
     QString action = request["action"].toString();
     if (action == "login") {
-        return handleLogin(request);
+        return handleLogin(client, request);
     } else if (action == "tokenLogin") {
-        return handleTokenLogin(request);
+        return handleTokenLogin(client, request);
     } else if (action == "signup") {
         return handleSignUp(request);
     } else if (action == "getPersonalInfo") {
@@ -73,9 +118,9 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
     } else if (action == "updatePersonalInfo") {
         return handleUpdatePersonalInfo(request);
     } else if (action == "doctorLogin") {
-        return handleDoctorLogin(request);
+        return handleDoctorLogin(client, request);
     } else if (action == "doctorTokenLogin") {
-        return handleDoctorTokenLogin(request);
+        return handleDoctorTokenLogin(client, request);
     } else if (action == "doctorSignup") {
         return handleDoctorSignUp(request);
     } else if (action == "doctorGetPersonalInfo") {
@@ -104,7 +149,7 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
 }
 
 // Handle normal username/password login
-QJsonObject Server::handleLogin(const QJsonObject &request) {
+QJsonObject Server::handleLogin(QTcpSocket *client, const QJsonObject &request) {
     QString username = request["username"].toString();
     QString password = request["password"].toString();
 
@@ -115,7 +160,7 @@ QJsonObject Server::handleLogin(const QJsonObject &request) {
 
     if (query.exec() && query.next()) {
         int userId = query.value("id").toInt();
-        return createSessionForUser(userId, username);
+        return createSessionForUser(userId, username, client);
     } else {
         QJsonObject reply;
         reply["action"] = "login";
@@ -141,7 +186,7 @@ int Server::checkToken(const QString &token) {
 }
 
 // Revised handleTokenLogin using checkToken
-QJsonObject Server::handleTokenLogin(const QJsonObject &request) {
+QJsonObject Server::handleTokenLogin(QTcpSocket *client, const QJsonObject &request) {
     QString token = request["token"].toString();
     int userId = checkToken(token);
 
@@ -157,7 +202,8 @@ QJsonObject Server::handleTokenLogin(const QJsonObject &request) {
         if (query.exec() && query.next()) {
             username = query.value("username").toString();
         }
-        return createSessionForUser(userId, username);
+
+        return createSessionForUser(userId, username, client);
     } else {
         reply["status"] = "retry";
         return reply;
@@ -206,7 +252,7 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
     return reply;
 }
 
-QJsonObject Server::createSessionForUser(const int &userId, const QString &username) {
+QJsonObject Server::createSessionForUser(const int &userId, const QString &username, QTcpSocket* sock) {
     // Generate token
     QString token = generateToken();
 
@@ -223,6 +269,10 @@ QJsonObject Server::createSessionForUser(const int &userId, const QString &usern
     update.bindValue(":id", userId);
     update.exec();
 
+    // Replace temp socket in clients map with real token
+
+    clients[token] = sock;
+
     // Prepare reply
     QJsonObject reply;
     reply["action"] = "login";
@@ -234,7 +284,7 @@ QJsonObject Server::createSessionForUser(const int &userId, const QString &usern
     return reply;
 }
 
-QJsonObject Server::handleDoctorLogin(const QJsonObject &request) {
+QJsonObject Server::handleDoctorLogin(QTcpSocket *client, const QJsonObject &request) {
     QString username = request["username"].toString();
     QString password = request["password"].toString();
 
@@ -245,7 +295,7 @@ QJsonObject Server::handleDoctorLogin(const QJsonObject &request) {
 
     if (query.exec() && query.next()) {
         int userId = query.value("id").toInt();
-        return createSessionForDoctor(userId, username);
+        return createSessionForDoctor(userId, username, client);
     } else {
         QJsonObject reply;
         reply["action"] = "doctorLogin";
@@ -271,7 +321,7 @@ int Server::checkDoctorToken(const QString &token) {
 }
 
 // Revised handleTokenLogin using checkToken
-QJsonObject Server::handleDoctorTokenLogin(const QJsonObject &request) {
+QJsonObject Server::handleDoctorTokenLogin(QTcpSocket *client, const QJsonObject &request) {
     QString token = request["token"].toString();
     int userId = checkDoctorToken(token);
 
@@ -287,7 +337,7 @@ QJsonObject Server::handleDoctorTokenLogin(const QJsonObject &request) {
         if (query.exec() && query.next()) {
             username = query.value("username").toString();
         }
-        return createSessionForDoctor(userId, username);
+        return createSessionForDoctor(userId, username, client);
     } else {
         reply["status"] = "retry";
         return reply;
@@ -336,7 +386,7 @@ QJsonObject Server::handleDoctorSignUp(const QJsonObject &request) {
     return reply;
 }
 
-QJsonObject Server::createSessionForDoctor(const int &userId, const QString &username) {
+QJsonObject Server::createSessionForDoctor(const int &userId, const QString &username, QTcpSocket* sock) {
     // Generate token
     QString token = generateToken();
 
@@ -352,6 +402,8 @@ QJsonObject Server::createSessionForDoctor(const int &userId, const QString &use
     update.bindValue(":expiry", static_cast<qint64>(expiry));
     update.bindValue(":id", userId);
     update.exec();
+
+    clients[token] = sock;
 
     // Prepare reply
     QJsonObject reply;
@@ -807,25 +859,23 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
 
     QString token = request["token"].toString();
     QString messageText = request["message"].toString();
+    int partnerId = request["partner_id"].toInt();
+
     if (messageText.isEmpty()) {
         reply["status"] = "error";
         reply["message"] = "消息不能为空";
         return reply;
     }
 
-    int patientId = checkToken(token);
-    int doctorId = -1;
+    int senderPatientId = checkToken(token);
+    int senderDoctorId = -1;
     QString senderType;
 
-    if (patientId > 0) {
-        // Sender is patient
-        doctorId = request["partner_id"].toInt();
+    if (senderPatientId > 0) {
         senderType = "patient";
     } else {
-        // Try doctor
-        doctorId = checkDoctorToken(token);
-        if (doctorId > 0) {
-            patientId = request["partner_id"].toInt();
+        senderDoctorId = checkDoctorToken(token);
+        if (senderDoctorId > 0) {
             senderType = "doctor";
         } else {
             reply["status"] = "error";
@@ -834,18 +884,16 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
         }
     }
 
-    if (doctorId <= 0 || patientId <= 0) {
-        reply["status"] = "error";
-        reply["message"] = "无效的ID";
-        return reply;
-    }
+    // Determine recipient type
+    int recipientPatientId = (senderType == "doctor") ? partnerId : -1;
+    int recipientDoctorId  = (senderType == "patient") ? partnerId : -1;
 
-    // Insert message into database
+    // Save message to DB
     QSqlQuery query;
     query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
                   "VALUES (:doctorId, :patientId, :senderType, :message)");
-    query.bindValue(":doctorId", doctorId);
-    query.bindValue(":patientId", patientId);
+    query.bindValue(":doctorId", senderDoctorId > 0 ? senderDoctorId : recipientDoctorId);
+    query.bindValue(":patientId", senderPatientId > 0 ? senderPatientId : recipientPatientId);
     query.bindValue(":senderType", senderType);
     query.bindValue(":message", messageText);
 
@@ -855,23 +903,51 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
         return reply;
     }
 
+    // Reply to sender
     reply["status"] = "success";
     reply["sender_type"] = senderType;
     reply["message"] = messageText;
 
-    // Optional: Notify recipient immediately
-    // If you have a connected socket map: e.g., patientSockets[patientId] or doctorSockets[doctorId]
-    // you could do something like:
-    // if (senderType == "doctor" && patientSockets.contains(patientId)) {
-    //     patientSockets[patientId]->send(reply); // pseudo code
-    // }
-    // else if (senderType == "patient" && doctorSockets.contains(doctorId)) {
-    //     doctorSockets[doctorId]->send(reply);
-    // }
+    // Notify recipient if online
+    QString recipientToken;
+    if (senderType == "doctor") {
+        recipientToken = getPatientToken(recipientPatientId);  // implement this function: DB query for patient token
+    } else if (senderType == "patient") {
+        recipientToken = getDoctorToken(recipientDoctorId);   // implement this function: DB query for doctor token
+    }
+
+    if (!recipientToken.isEmpty() && clients.contains(recipientToken)) {
+        QTcpSocket *recipientSocket = clients[recipientToken];
+        QJsonDocument doc(reply);
+        recipientSocket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+    }
 
     return reply;
 }
 
+QString Server::getPatientToken(int id) {
+    QSqlQuery query;
+    query.prepare("SELECT token FROM users WHERE id = :id");
+    query.bindValue(":id", id);
+
+    if (query.exec() && query.next()) {
+        return query.value("token").toString();
+    }
+
+    return QString(); // empty string if not found
+}
+
+QString Server::getDoctorToken(int id) {
+    QSqlQuery query;
+    query.prepare("SELECT token FROM doctors WHERE id = :id");
+    query.bindValue(":id", id);
+
+    if (query.exec() && query.next()) {
+        return query.value("token").toString();
+    }
+
+    return QString(); // empty string if not found
+}
 
 QString Server::generateToken() {
     QByteArray randomBytes = QUuid::createUuid().toByteArray();

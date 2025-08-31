@@ -1,54 +1,60 @@
 #pragma once
-#include <QWebSocketServer>
-#include <QWebSocket>
+
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include <QHash>
 #include "doctoradviceserver.h"
 
-class Server : public QObject {
+class Server : public QTcpServer {
     Q_OBJECT
+
 public:
     explicit Server(QObject *parent = nullptr);
-    bool start(quint16 port);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor) override;
 
 private slots:
-    void onNewConnection();
-    void onTextMessageReceived(const QString &message);
+    void onReadyRead();
     void onDisconnected();
+    QJsonObject handleAction(QTcpSocket* client, const QJsonObject &request);
 
 private:
-    QWebSocketServer *webSocketServer;
-    QHash<QString, QWebSocket*> clients;  // token/username -> socket
+    //QList<QTcpSocket*> clients;
+    QHash<QString, QTcpSocket*> clients;
 
-    void sendResponse(QWebSocket *client, const QJsonObject &reply);
+    void sendResponse(QTcpSocket *client, const QJsonObject &reply);
     QString generateToken();
 
-    // === Handlers ===
-    QJsonObject handleAction(const QJsonObject &request);
-
-    QJsonObject handleLogin(const QJsonObject &request);
-    QJsonObject handleTokenLogin(const QJsonObject &request);
+    // User handling
+    QJsonObject handleLogin(QTcpSocket *client, const QJsonObject &request);
+    QJsonObject handleTokenLogin(QTcpSocket *client, const QJsonObject &request);
     QJsonObject handleSignUp(const QJsonObject &request);
-    QJsonObject createSessionForUser(const int &userId, const QString &username);
+    QJsonObject createSessionForUser(const int &userId, const QString &username, QTcpSocket* sock);
     QJsonObject handleGetPersonalInfo(const QJsonObject &request);
     QJsonObject handleUpdatePersonalInfo(const QJsonObject &request);
     QJsonObject handleGetSessionInfo(const QJsonObject &request);
     int checkToken(const QString &token);
+    QString getPatientToken(int id);
 
-    QJsonObject handleDoctorLogin(const QJsonObject &request);
-    QJsonObject handleDoctorTokenLogin(const QJsonObject &request);
+    // Doctor handling
+    QJsonObject handleDoctorLogin(QTcpSocket *client, const QJsonObject &request);
+    QJsonObject handleDoctorTokenLogin(QTcpSocket *client, const QJsonObject &request);
     QJsonObject handleDoctorSignUp(const QJsonObject &request);
-    QJsonObject createSessionForDoctor(const int &userId, const QString &username);
+    QJsonObject createSessionForDoctor(const int &userId, const QString &username, QTcpSocket* sock);
     QJsonObject handleDoctorGetPersonalInfo(const QJsonObject &request);
     QJsonObject handleDoctorUpdatePersonalInfo(const QJsonObject &request);
     QJsonObject handleDoctorGetSessionInfo(const QJsonObject &request);
     QJsonObject handleEndSession(const QJsonObject &request);
     int checkDoctorToken(const QString &token);
+    QString getDoctorToken(int id);
 
+    // Messaging
     QJsonObject handleGetMessages(const QJsonObject &request);
     QJsonObject handleSendMessage(const QJsonObject &request);
 
+    // Doctor advice server
     DoctorAdviceServer doctorAdviceServer;
     QJsonObject forwardDoctorAdviceRequest(const QJsonObject &actionRequest);
 };

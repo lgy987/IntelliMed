@@ -73,6 +73,7 @@ void NetworkManager::sendSignUp(const QString &username, const QString &password
 
 void NetworkManager::sendGetPersonalInfo()
 {
+    qDebug() << "send get personal info";
     QJsonObject req;
     req["action"] = "getPersonalInfo";
     req["token"]  = Session::instance().token();

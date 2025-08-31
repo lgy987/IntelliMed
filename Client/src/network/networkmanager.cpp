@@ -146,6 +146,39 @@ void NetworkManager::sendDoctorUpdatePersonalInfo(const QJsonObject &data)
     socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
 }
 
+void NetworkManager::sendGetSessionInfo()
+{
+
+    QJsonObject req;
+    req["action"] = "getSessionInfo";
+    req["token"]  = Session::instance().token();
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void NetworkManager::sendDoctorGetSessionInfo()
+{
+
+    QJsonObject req;
+    req["action"] = "doctorGetSessionInfo";
+    req["token"]  = DoctorSession::instance().token();
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
+void NetworkManager::sendDoctorEndSession(int sessionId)
+{
+    QJsonObject req;
+    req["action"] = "endSession";
+    req["token"] = DoctorSession::instance().token();
+    req["sessionId"] = sessionId;
+
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
+}
+
 void NetworkManager::onReadyRead()
 {
     while (socket->canReadLine()) {
@@ -155,6 +188,7 @@ void NetworkManager::onReadyRead()
         QJsonObject obj = doc.object();
 
         QString action = obj.value("action").toString();
+        qDebug().noquote() << QJsonDocument(obj).toJson(QJsonDocument::Indented);
         if (action == "signup") {
             emit signUpResponse(obj);
         } else if (action == "login") {
@@ -167,6 +201,12 @@ void NetworkManager::onReadyRead()
             emit doctorLoginResponse(obj);
         } else if (action == "doctorGetPersonalInfo" || action == "doctorUpdatePersonalInfo") {
             emit doctorPersonalInfoResponse(obj);
+        } else if (action == "getSessionInfo") {
+            emit sessionInfoResponse(obj);
+        } else if (action == "doctorGetSessionInfo") {
+            emit doctorSessionInfoResponse(obj);
+        } else if (action == "endSession") {
+            emit doctorEndSessionResponse(obj);
         }
     }
 }

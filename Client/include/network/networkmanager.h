@@ -26,6 +26,9 @@ public:
     void sendDoctorSignUp(const QString &username, const QString &password, const QString &email);
     void sendDoctorGetPersonalInfo();
     void sendDoctorUpdatePersonalInfo(const QJsonObject &data);
+    void sendGetSessionInfo();
+    void sendDoctorGetSessionInfo();
+    void sendDoctorEndSession(int sessionId);
 
 signals:
     void loginResponse(const QJsonObject &obj);
@@ -34,6 +37,9 @@ signals:
     void doctorLoginResponse(const QJsonObject &obj);
     void doctorSignUpResponse(const QJsonObject &obj);
     void doctorPersonalInfoResponse(const QJsonObject &obj);
+    void sessionInfoResponse(const QJsonObject &obj);
+    void doctorSessionInfoResponse(const QJsonObject &obj);
+    void doctorEndSessionResponse(const QJsonObject &reply);
 
 private slots:
     void onReadyRead();

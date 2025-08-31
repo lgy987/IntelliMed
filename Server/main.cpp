@@ -51,10 +51,33 @@ bool initDatabase() {
     if (!query.exec("CREATE TABLE IF NOT EXISTS doctor_personal_info ("
                     "id INTEGER PRIMARY KEY,"
                     "name TEXT,"
+                    "department TEXT,"
                     "title TEXT,"
                     "description TEXT,"
                     "FOREIGN KEY(id) REFERENCES doctors(id) ON DELETE CASCADE)")) {
         qCritical() << "Failed to create personal_info table:" << query.lastError();
+        return false;
+    }
+
+    if (!query.exec("CREATE TABLE IF NOT EXISTS session ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "patientId INTEGER UNIQUE,"
+                    "doctorId INTEGER,"
+                    "time TEXT,"
+                    "FOREIGN KEY(patientId) REFERENCES users(id) ON DELETE CASCADE,"
+                    "FOREIGN KEY(doctorId) REFERENCES doctors(id) ON DELETE CASCADE)")) {
+        qCritical() << "Failed to create session table:" << query.lastError();
+        return false;
+    }
+
+    if (!query.exec("CREATE TABLE IF NOT EXISTS session_old ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "patientId INTEGER,"
+                    "doctorId INTEGER,"
+                    "time TEXT,"
+                    "FOREIGN KEY(patientId) REFERENCES users(id) ON DELETE CASCADE,"
+                    "FOREIGN KEY(doctorId) REFERENCES doctors(id) ON DELETE CASCADE)")) {
+        qCritical() << "Failed to create session table:" << query.lastError();
         return false;
     }
 

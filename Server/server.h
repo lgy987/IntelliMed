@@ -28,6 +28,7 @@ private:
     QJsonObject createSessionForUser(const int &userId, const QString &username);
     QJsonObject handleGetPersonalInfo(const QJsonObject &request);
     QJsonObject handleUpdatePersonalInfo(const QJsonObject &request);
+    QJsonObject handleGetSessionInfo(const QJsonObject &request);
     int checkToken(const QString &token);
 
     QJsonObject handleDoctorLogin(const QJsonObject &request);
@@ -36,5 +37,7 @@ private:
     QJsonObject createSessionForDoctor(const int &userId, const QString &username);
     QJsonObject handleDoctorGetPersonalInfo(const QJsonObject &request);
     QJsonObject handleDoctorUpdatePersonalInfo(const QJsonObject &request);
+    QJsonObject handleDoctorGetSessionInfo(const QJsonObject &request);
+    QJsonObject handleEndSession(const QJsonObject &request);
     int checkDoctorToken(const QString &token);
 };

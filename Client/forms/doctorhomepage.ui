@@ -15,77 +15,65 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_main">
-    <!-- Sidebar buttons -->
     <item>
-     <widget class="QWidget" name="sidebar">
-      <property name="minimumWidth">
-       <number>180</number>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_sidebar">
-        <item>
-         <widget class="QPushButton" name="btnUser">
-          <property name="text">
-           <string>👤 用户管理</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnAppointment">
-          <property name="text">
-           <string>📅 挂号预约</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnCases">
-          <property name="text">
-           <string>📄 病例管理</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnOrders">
-          <property name="text">
-           <string>💊 医嘱管理</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnHealth">
-          <property name="text">
-           <string>❤️ 健康评估</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnLogout">
-          <property name="text">
-           <string>登出</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-      </layout>
-      <property name="styleSheet">
-       <string notr="true">
-       </string>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout_sidebar">
+      <item>
+       <widget class="QPushButton" name="btnUser">
+        <property name="text">
+         <string>👤 用户管理</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnAppointment">
+        <property name="text">
+         <string>📅 当前会诊</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCases">
+        <property name="text">
+         <string>📄 病例管理</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnOrders">
+        <property name="text">
+         <string>💊 医嘱管理</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnHealth">
+        <property name="text">
+         <string>❤️ 健康评估</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnLogout">
+        <property name="text">
+         <string>登出</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
-
-    <!-- Main content area -->
     <item>
      <widget class="QStackedWidget" name="stackedPages">
       <widget class="QWidget" name="pageUser"/>
@@ -98,7 +86,16 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>

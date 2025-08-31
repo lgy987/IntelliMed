@@ -24,6 +24,7 @@ private:
     void setupButtons();
     QList<QPushButton*> buttons;
     void setupPersonalInfoForm();
+    void setupSessionForm();
 };
 
 #endif // HOMEPAGE_H

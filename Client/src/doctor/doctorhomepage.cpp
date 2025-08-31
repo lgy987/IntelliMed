@@ -1,5 +1,6 @@
 #include "doctorhomepage.h"
 #include "ui_doctorhomepage.h"
+#include "doctorsessionform.h"
 #include "doctorpersonalinfoform.h"
 #include "doctorsession.h"
 
@@ -11,7 +12,8 @@ DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     ui->setupUi(this);
     setupButtons();
     setupPersonalInfoForm();
-    QVBoxLayout* sidebarLayout = ui->verticalLayout_sidebar;
+    setupSessionForm();
+    QVBoxLayout *sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
         sidebarLayout->setSpacing(4);                 // spacing between buttons
@@ -47,6 +49,15 @@ void DoctorHomePage::setupPersonalInfoForm()
     layout->addWidget(dpiform);
 }
 
+void DoctorHomePage::setupSessionForm()
+{
+    DoctorSessionForm* sform = new DoctorSessionForm(this);
+    // Add it to the stacked page layout
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(1));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(sform);
+}
+
 void DoctorHomePage::setupButtons()
 {
     // Set all buttons initially as inactive (gray / transparent)
@@ -72,7 +83,7 @@ void DoctorHomePage::setupButtons()
             padding: 10px;
             margin: 0px;
             border-radius: 5px;
-            background-color: #2193F3; /* modern blue */
+            background-color: #06b6d4; /* modern blue */
             text-align: left;
         }
     )";

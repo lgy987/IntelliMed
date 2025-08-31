@@ -1,6 +1,7 @@
 #include "homepage.h"
 #include "ui_homepage.h"
 #include "personalinfoform.h"
+#include "sessionform.h"
 #include "session.h"
 
 HomePage::HomePage(QWidget *loginForm, QWidget *parent)
@@ -11,6 +12,7 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     ui->setupUi(this);
     setupButtons();
     setupPersonalInfoForm();
+    setupSessionForm();
     QVBoxLayout* sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -45,6 +47,15 @@ void HomePage::setupPersonalInfoForm()
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(0));
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(piform);
+}
+
+void HomePage::setupSessionForm()
+{
+    SessionForm* sform = new SessionForm(this);
+    // Add it to the stacked page layout
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(1));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(sform);
 }
 
 void HomePage::setupButtons()

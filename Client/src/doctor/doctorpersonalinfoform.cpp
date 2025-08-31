@@ -13,6 +13,7 @@ DoctorPersonalInfoForm::DoctorPersonalInfoForm(QWidget *homepage, QWidget *paren
     //LoginForm::setupInputValidation(ui->usernameEdit, "^[A-Za-z0-9_]{1,50}$");
     //LoginForm::setupInputValidation(ui->emailEdit, R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,50}$)");
     LoginForm::setupInputValidation(ui->nameEdit, "^[\u4e00-\u9fa5·]{1,50}$");
+    LoginForm::setupInputValidation(ui->departmentEdit, "^[\u4e00-\u9fa5·A-Za-z0-9._%+-]{1,50}$");
     LoginForm::setupInputValidation(ui->titleEdit, "^[\u4e00-\u9fa5·A-Za-z0-9._%+-]{1,50}$");
     //LoginForm::setupInputValidation(ui->descriptionEdit, "^[A-Za-z0-9._%+-\u4e00-\u9fa5·]{1,1000}$");
 
@@ -36,6 +37,7 @@ DoctorPersonalInfoForm::~DoctorPersonalInfoForm()
 
 void DoctorPersonalInfoForm::setEditMode(bool enable) {
     ui->nameEdit->setEnabled(enable);
+    ui->departmentEdit->setEnabled(enable);
     ui->titleEdit->setEnabled(enable);
     ui->descriptionEdit->setEnabled(enable);
 }
@@ -52,6 +54,7 @@ void DoctorPersonalInfoForm::onSaveClicked() {
     setEditMode(false);
     QJsonObject data;
     data["name"]         = ui->nameEdit->text();
+    data["department"] = ui->departmentEdit->text();
     data["title"]    = ui->titleEdit->text();
     data["description"] = ui->descriptionEdit->toPlainText();
     NetworkManager::instance().sendDoctorUpdatePersonalInfo(data);
@@ -74,6 +77,7 @@ void DoctorPersonalInfoForm::onPersonalInfoReceived(const QJsonObject &reply)
         ui->usernameEdit->setText(reply["username"].toString());
         ui->emailEdit->setText(reply["email"].toString());
         ui->nameEdit->setText(reply["name"].toString());
+        ui->departmentEdit->setText(reply["department"].toString());
         ui->titleEdit->setText(reply["title"].toString());
         ui->descriptionEdit->setPlainText(reply["description"].toString());
     }

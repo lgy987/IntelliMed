@@ -3,6 +3,9 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QCryptographicHash>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 Server::Server(QObject *parent) : QTcpServer(parent) {
     if (!listen(QHostAddress::Any, 12345)) {
@@ -77,6 +80,12 @@ QJsonObject Server::handleAction(const QJsonObject &request) {
         return handleDoctorGetPersonalInfo(request);
     } else if (action == "doctorUpdatePersonalInfo") {
         return handleDoctorUpdatePersonalInfo(request);
+    } else if (action == "getSessionInfo") {
+        return handleGetSessionInfo(request);
+    } else if (action == "doctorGetSessionInfo") {
+        return handleDoctorGetSessionInfo(request);
+    } else if (action == "endSession") {
+        return handleEndSession(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -446,7 +455,7 @@ QJsonObject Server::handleDoctorGetPersonalInfo(const QJsonObject &request) {
     // LEFT JOIN to make sure we still get username/email even if no personal_info row exists yet
     query.prepare(R"(
         SELECT u.username, u.email,
-               p.name, p.title, p.description
+               p.name, p.department, p.title, p.description
         FROM doctors u
         LEFT JOIN doctor_personal_info p ON u.id = p.id
         WHERE u.id = :id
@@ -458,16 +467,18 @@ QJsonObject Server::handleDoctorGetPersonalInfo(const QJsonObject &request) {
         reply["username"]     = query.value("username").toString();
         reply["email"]        = query.value("email").toString();
         reply["name"]         = query.value("name").toString();
-        reply["title"]    = query.value("title").toString();
-        reply["description"] = query.value("description").toString();
+        reply["department"]   = query.value("department").toString();
+        reply["title"]        = query.value("title").toString();
+        reply["description"]  = query.value("description").toString();
     } else {
         // This should never happen if userId is valid, but fallback anyway
         reply["status"]       = "ok";
         reply["username"]     = "";
         reply["email"]        = "";
         reply["name"]         = "";
-        reply["title"]    = "";
-        reply["description"] = "";
+        reply["department"]   = "";
+        reply["title"]        = "";
+        reply["description"]  = "";
     }
 
     return reply;
@@ -486,19 +497,22 @@ QJsonObject Server::handleDoctorUpdatePersonalInfo(const QJsonObject &request) {
     }
 
     QString name = request["name"].toString().trimmed();
+    QString department = request["department"].toString().trimmed();
     QString title = request["title"].toString().trimmed();
     QString description = request["description"].toString().trimmed();
 
     QSqlQuery query;
     // Use INSERT with ON CONFLICT(id) DO UPDATE for upsert
-    query.prepare("INSERT INTO doctor_personal_info (id, name, title, description) "
-                  "VALUES (:id, :name, :title, :description) "
+    query.prepare("INSERT INTO doctor_personal_info (id, name, department, title, description) "
+                  "VALUES (:id, :name, :department, :title, :description) "
                   "ON CONFLICT(id) DO UPDATE SET "
                   "    name = excluded.name, "
+                  "    department = excluded.department, "
                   "    title = excluded.title, "
                   "    description = excluded.description;");
     query.bindValue(":id", userId);
     query.bindValue(":name", name);
+    query.bindValue(":department", department);
     query.bindValue(":title", title);
     query.bindValue(":description", description);
 
@@ -509,6 +523,206 @@ QJsonObject Server::handleDoctorUpdatePersonalInfo(const QJsonObject &request) {
         reply["status"] = "error";
         reply["message"] = "更新失败：" + query.lastError().text();
     }
+
+    return reply;
+}
+
+QJsonObject Server::handleGetSessionInfo(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "getSessionInfo";
+
+    // Authenticate patient
+    QString token = request["token"].toString();
+    int patientId = checkToken(token);
+    if (patientId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的token，请重新登录";
+        return reply;
+    }
+
+    QSqlQuery query;
+    query.prepare(R"(
+    SELECT s.id AS sessionId, s.time,
+
+           -- Patient info
+           pi.name         AS patientName,
+           pi.id_number    AS patientIdNumber,
+           pi.phone_number AS patientPhone,
+
+           -- Doctor info
+           dpi.name        AS doctorName,
+           dpi.department  AS doctorDepartment,
+           dpi.title       AS doctorTitle,
+           dpi.description AS doctorDescription
+
+    FROM session s
+    LEFT JOIN personal_info pi         ON s.patientId = pi.id
+    LEFT JOIN doctor_personal_info dpi ON s.doctorId = dpi.id
+
+    WHERE s.patientId = :patientId
+)");
+    query.bindValue(":patientId", patientId);
+
+    if (query.exec() && query.next()) {
+        reply["status"] = "ok";
+
+        // Session info
+        reply["sessionId"] = query.value("sessionId").toInt();
+        reply["time"]      = query.value("time").toString();
+
+        // Patient info
+        QJsonObject patient;
+        patient["name"]      = query.value("patientName").toString();
+        patient["idNumber"]  = query.value("patientIdNumber").toString();
+        patient["phone"]     = query.value("patientPhone").toString();
+        reply["patient"] = patient;
+
+        // Doctor info
+        QJsonObject doctor;
+        doctor["name"]        = query.value("doctorName").toString();
+        doctor["department"]  = query.value("doctorDepartment").toString();
+        doctor["title"]       = query.value("doctorTitle").toString();
+        doctor["description"] = query.value("doctorDescription").toString();
+        reply["doctor"] = doctor;
+
+    } else {
+        reply["status"] = "ok";
+        reply["message"] = "未找到该会话";
+    }
+
+    return reply;
+}
+
+QJsonObject Server::handleDoctorGetSessionInfo(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "doctorGetSessionInfo";
+
+    // Authenticate doctor
+    QString token = request["token"].toString();
+    int doctorId = checkDoctorToken(token);
+    if (doctorId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的token，请重新登录";
+        return reply;
+    }
+
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT s.id AS sessionId, s.time,
+               pi.name        AS patientName,
+               pi.id_number   AS patientIdNumber,
+               pi.phone_number AS patientPhone,
+               dpi.name       AS doctorName,
+               dpi.department AS doctorDepartment,
+               dpi.title      AS doctorTitle,
+               dpi.description AS doctorDescription
+        FROM session s
+        LEFT JOIN personal_info pi          ON s.patientId = pi.id
+        LEFT JOIN doctor_personal_info dpi  ON s.doctorId = dpi.id
+        WHERE s.doctorId = :doctorId
+        ORDER BY s.time DESC
+    )");
+
+    query.bindValue(":doctorId", doctorId);
+    QJsonArray sessionsArray;
+
+    if (query.exec()) {
+        while (query.next()) {
+            QJsonObject sessionObj;
+
+            // Session info
+            sessionObj["sessionId"] = query.value("sessionId").toInt();
+            sessionObj["time"]      = query.value("time").toString();
+
+            // Patient info
+            QJsonObject patient;
+            patient["name"]       = query.value("patientName").toString();
+            patient["idNumber"]   = query.value("patientIdNumber").toString();
+            patient["phone"]      = query.value("patientPhone").toString();
+            sessionObj["patient"] = patient;
+
+            // Doctor info
+            QJsonObject doctor;
+            doctor["name"]        = query.value("doctorName").toString();
+            doctor["department"]  = query.value("doctorDepartment").toString();
+            doctor["title"]       = query.value("doctorTitle").toString();
+            doctor["description"] = query.value("doctorDescription").toString();
+            sessionObj["doctor"] = doctor;
+
+            sessionsArray.append(sessionObj);
+        }
+    }
+
+    reply["status"] = "ok";
+    reply["sessions"] = sessionsArray;
+
+    return reply;
+}
+
+QJsonObject Server::handleEndSession(const QJsonObject &request) {
+    QJsonObject reply;
+    reply["action"] = "endSession";
+
+    // Step 1: Authenticate doctor
+    QString token = request["token"].toString();
+    int doctorId = checkDoctorToken(token);
+    if (doctorId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的token，请重新登录";
+        return reply;
+    }
+
+    // Step 2: Validate sessionId
+    int sessionId = request["sessionId"].toInt();
+    if (sessionId <= 0) {
+        reply["status"] = "error";
+        reply["message"] = "无效的sessionId";
+        return reply;
+    }
+
+    QSqlQuery query;
+
+    // Step 3: Check session exists and belongs to doctor
+    query.prepare("SELECT * FROM session WHERE id = :sessionId AND doctorId = :doctorId");
+    query.bindValue(":sessionId", sessionId);
+    query.bindValue(":doctorId", doctorId);
+
+    if (!query.exec() || !query.next()) {
+        reply["status"] = "error";
+        reply["message"] = "未找到该会话或无权限结束";
+        return reply;
+    }
+
+    // Step 4: Move record to session_old
+    int patientId = query.value("patientId").toInt();
+    QString time = query.value("time").toString();
+
+    QSqlQuery insertQuery;
+    insertQuery.prepare("INSERT INTO session_old (id, patientId, doctorId, time) VALUES (:id, :patientId, :doctorId, :time)");
+    insertQuery.bindValue(":id", sessionId);  // keep same id
+    insertQuery.bindValue(":patientId", patientId);
+    insertQuery.bindValue(":doctorId", doctorId);
+    insertQuery.bindValue(":time", time);
+
+    if (!insertQuery.exec()) {
+        reply["status"] = "error";
+        reply["message"] = "移动会话到历史记录失败: " + insertQuery.lastError().text();
+        return reply;
+    }
+
+    // Step 5: Delete from active session table
+    query.prepare("DELETE FROM session WHERE id = :sessionId");
+    query.bindValue(":sessionId", sessionId);
+
+    if (!query.exec()) {
+        reply["status"] = "error";
+        reply["message"] = "删除会话失败: " + query.lastError().text();
+        return reply;
+    }
+
+    reply["status"] = "ok";
+    reply["message"] = "会诊已结束";
+    reply["sessionId"] = sessionId;
 
     return reply;
 }

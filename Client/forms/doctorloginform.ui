@@ -29,62 +29,62 @@
    </item>
    <item>
     <widget class="QFrame" name="loginFrame">
-     <property name="styleSheet">
-      <string notr="true">
-        QFrame {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-        }
-        QLabel {
-            font-size: 14px;
-            color: #374151;
-        }
-        QLineEdit {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 14px;
-            background: #f9fafb;
-        }
-        QLineEdit:focus {
-            border: 1px solid #3b82f6;
-            background: #ffffff;
-        }
-        QPushButton {
-            border: none;
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 15px;
-            font-weight: bold;
-        }
-        QLineEdit, QCheckBox {
-            color: black;
-        }
-        #loginButton {
-            background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                             stop:0 #3b82f6, stop:1 #2563eb);
-            color: white;
-        }
-        #loginButton:hover {
-            background-color: #1d4ed8;
-        }
-        #signUpButton, #patientLoginButton {
-            background: #e5e7eb;
-            color: #111827;
-        }
-        #signUpButton:hover, #patientLoginButton:hover {
-            background: #d1d5db;
-        }
-        #forgotPasswordLabel {
-            color: #3b82f6;
-            font-size: 12px;
-        }
-        #forgotPasswordLabel:hover {
-            text-decoration: underline;
-        }
-      </string>
-     </property>
+    <property name="styleSheet">
+     <string notr="true">
+       QFrame {
+           background: #ffffff;
+           border-radius: 16px;
+           padding: 24px;
+       }
+       QLabel {
+           font-size: 14px;
+           color: #374151;
+       }
+       QLineEdit {
+           border: 1px solid #d1d5db;
+           border-radius: 8px;
+           padding: 8px;
+           font-size: 14px;
+           background: #f9fafb;
+       }
+       QLineEdit:focus {
+           border: 1px solid #06b6d4;   /* changed */
+           background: #ffffff;
+       }
+       QPushButton {
+           border: none;
+           border-radius: 8px;
+           padding: 10px;
+           font-size: 15px;
+           font-weight: bold;
+       }
+       QLineEdit, QCheckBox {
+           color: black;
+       }
+       #loginButton {
+           background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                            stop:0 #06b6d4, stop:1 #0e7490);  /* changed */
+           color: white;
+       }
+       #loginButton:hover {
+           background-color: #0c4a6e;  /* changed */
+       }
+       #signUpButton, #patientLoginButton {
+           background: #e5e7eb;
+           color: #111827;
+       }
+       #signUpButton:hover, #patientLoginButton:hover {
+           background: #d1d5db;
+       }
+       #forgotPasswordLabel {
+           color: #06b6d4;   /* changed */
+           font-size: 12px;
+       }
+       #forgotPasswordLabel:hover {
+           text-decoration: underline;
+       }
+     </string>
+    </property>
      <layout class="QVBoxLayout" name="formLayout" stretch="0,0,0,0,0,0,0,0,0,0">
       <item>
        <widget class="QLabel" name="titleLabel">

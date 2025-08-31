@@ -53,10 +53,13 @@ void Message::appendMessage(const QString &senderType, const QString &text, cons
     msgLabel->setWordWrap(true);
     msgLabel->setText(QString("[%1] %2").arg(timestamp, text));
 
-    if ((m_isDoctor && senderType == "doctor") || (!m_isDoctor && senderType == "patient")) {
+    if ((!m_isDoctor && senderType == "patient") || (m_isDoctor && senderType == "doctor")) {
         msgLabel->setStyleSheet("background:#d1d5db; color:#111827; padding:8px; border-radius:8px; max-width:300px;");
         msgLabel->setAlignment(Qt::AlignRight);
-    } else {
+    } else if (m_isDoctor && senderType == "patient"){
+        msgLabel->setStyleSheet("background: #06b6d4; color:white; padding:8px; border-radius:8px; max-width:300px;");
+        msgLabel->setAlignment(Qt::AlignRight);
+    }else {
         msgLabel->setStyleSheet("background:#3b82f6; color:white; padding:8px; border-radius:8px; max-width:300px;");
         msgLabel->setAlignment(Qt::AlignLeft);
     }

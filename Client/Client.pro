@@ -24,6 +24,7 @@ SOURCES += \
     src/doctor/doctorpersonalinfoform.cpp \
     src/doctor/doctorsession.cpp \
     src/doctor/doctorsignupform.cpp \
+    src/doctor/doctorsessionform.cpp \
     src/patient/homepage.cpp \
     src/patient/loginform.cpp \
     src/patient/personalinfoform.cpp \
@@ -31,7 +32,7 @@ SOURCES += \
     src/patient/signupform.cpp \
     src/patient/sessionform.cpp \
     src/patient/message.cpp \
-    src/doctor/doctorsessionform.cpp \
+    src/patient/moodrecorder.cpp \
     src/network/networkmanager.cpp
 
 # Headers
@@ -44,6 +45,7 @@ HEADERS += \
     include/doctor/doctorsessionform.h \
     include/patient/homepage.h \
     include/patient/loginform.h \
+    include/patient/moodrecorder.h \
     include/patient/personalinfoform.h \
     include/patient/session.h \
     include/patient/sessionform.h \

@@ -858,6 +858,7 @@ QJsonObject Server::handleGetMessages(const QJsonObject &request) {
         msg["message"] = query.value("message").toString();
         QDateTime dt = query.value("timestamp").toDateTime();
         msg["timestamp"] = dt.toMSecsSinceEpoch();
+        msg["partner_id"] = request["partner_id"].toInt();
         messages.append(msg);
     }
 
@@ -920,6 +921,7 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
     reply["status"] = "success";
     reply["sender_type"] = senderType;
     reply["message"] = messageText;
+    reply["partner_id"] = (senderType == "patient") ? recipientDoctorId : recipientPatientId;
 
     // Notify recipient if online
     QString recipientToken;
@@ -994,13 +996,11 @@ void Server::handleAISendMessage(QTcpSocket *client, const QJsonObject &request)
         return;
     }
 
-    int recipientDoctorId  = 0;
-
     // Save message to DB
     QSqlQuery query;
     query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
                   "VALUES (:doctorId, :patientId, :senderType, :message)");
-    query.bindValue(":doctorId", recipientDoctorId);
+    query.bindValue(":doctorId", 0);
     query.bindValue(":patientId", senderPatientId);
     query.bindValue(":senderType", senderType);
     query.bindValue(":message", messageText);
@@ -1017,6 +1017,7 @@ void Server::handleAISendMessage(QTcpSocket *client, const QJsonObject &request)
     reply["status"] = "success";
     reply["sender_type"] = senderType;
     reply["message"] = messageText;
+    reply["partner_id"] = 0;
     sendResponse(client, reply);
 
     callAI(client, senderPatientId, messageText);
@@ -1098,6 +1099,7 @@ void Server::callAI(QTcpSocket *client, int senderPatientId, const QString &user
         response["status"] = "success";
         response["sender_type"] = "doctor";
         response["message"] = aiReply;
+        response["partner_id"] = 0;
 
         sendResponse(client, response);
 

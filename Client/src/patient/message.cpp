@@ -171,6 +171,8 @@ void Message::onGetMessages(const QJsonObject &obj)
     for (int i = 0; i < messages.size(); ++i) {
         QJsonObject msgObj = messages.at(i).toObject();
 
+        if(msgObj.value("partner_id").toInt() != m_partnerId) { continue; }
+
         qint64 ms = msgObj.value("timestamp").toVariant().toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(ms).toLocalTime();
 

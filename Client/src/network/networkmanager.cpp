@@ -235,7 +235,7 @@ void NetworkManager::onReadyRead()
         QJsonObject obj = doc.object();
 
         QString action = obj.value("action").toString();
-        //qDebug().noquote() << QJsonDocument(obj).toJson(QJsonDocument::Indented);
+        qDebug().noquote() << QJsonDocument(obj).toJson(QJsonDocument::Indented);
         if (action == "signup") {
             emit signUpResponse(obj);
         } else if (action == "login") {

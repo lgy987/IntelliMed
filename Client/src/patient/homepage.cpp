@@ -4,6 +4,9 @@
 #include "sessionform.h"
 #include "message.h"
 #include "session.h"
+#include "../DoctorAdvice/patientwindow.h"
+#include "../DoctorAdvice/medlink.h"
+
 
 HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +19,7 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     setupSessionForm();
     setupMessage();
     setupAI();
+    setupDoctorAdvice();
     QVBoxLayout* sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -82,6 +86,14 @@ void HomePage::setupAI()
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(3));
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(AImsg);
+}
+
+void HomePage::setupDoctorAdvice()
+{
+    PatientWindow *pw = new PatientWindow(&MedLink::instance(), this);
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(4));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(pw);
 }
 
 void HomePage::setupButtons()

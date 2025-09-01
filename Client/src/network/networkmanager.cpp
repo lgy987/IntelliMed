@@ -1,6 +1,7 @@
 #include "networkmanager.h"
 #include "session.h"
 #include "doctorsession.h"
+#include "../DoctorAdvice/medlink.h"
 #include <QJsonDocument>
 #include <QDebug>
 
@@ -34,6 +35,13 @@ void NetworkManager::disconnectFromServer()
     if (socket->state() != QAbstractSocket::UnconnectedState) {
         socket->close();
     }
+}
+
+void NetworkManager::send(const QJsonObject &req)
+{
+    qDebug().noquote() << "send" <<  QJsonDocument(req).toJson(QJsonDocument::Indented);
+    QJsonDocument doc(req);
+    socket->write(doc.toJson(QJsonDocument::Compact) + "\n");
 }
 
 void NetworkManager::sendLogin(const QString &username, const QString &password, bool remember)
@@ -258,6 +266,11 @@ void NetworkManager::onReadyRead()
             emit getMessagesResponse(obj);
         } else if (action == "sendMessage") {
             emit sendMessageResponse(obj);
+        } else if (action == "doctoradvice") {
+            if (obj.value("content").isObject()) {
+                QJsonObject content = obj.value("content").toObject();
+                MedLink::instance().onReadyRead(content);
+            }
         }
     }
 }

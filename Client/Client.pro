@@ -32,7 +32,12 @@ SOURCES += \
     src/patient/signupform.cpp \
     src/patient/sessionform.cpp \
     src/patient/message.cpp \
-    src/network/networkmanager.cpp
+    src/network/networkmanager.cpp \
+    DoctorAdvice/patientwindow.cpp \
+    DoctorAdvice/doctorwindow.cpp \
+    DoctorAdvice/medlink.cpp \
+    DoctorAdvice/orderdetaildialog.cpp \
+    DoctorAdvice/ui_theme.cpp \
 
 # Headers
 HEADERS += \
@@ -51,6 +56,11 @@ HEADERS += \
     include/patient/signupform.h \
     include/patient/message.h \
     include/network/networkmanager.h \
+    DoctorAdvice/patientwindow.h \
+    DoctorAdvice/doctorwindow.h \
+    DoctorAdvice/medlink.h \
+    DoctorAdvice/orderdetaildialog.h \
+    DoctorAdvice/ui_theme.h \
 
 # Forms
 FORMS += \

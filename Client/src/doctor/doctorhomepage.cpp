@@ -3,6 +3,7 @@
 #include "doctorsessionform.h"
 #include "doctorpersonalinfoform.h"
 #include "doctorsession.h"
+#include "../DoctorAdvice/doctorwindow.h"
 
 DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     : QMainWindow(parent)
@@ -14,6 +15,7 @@ DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     setupPersonalInfoForm();
     setupSessionForm();
     setupMessage();
+    setupDoctorAdvice();
     QVBoxLayout *sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -71,6 +73,14 @@ void DoctorHomePage::setupMessage()
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(2));
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(msg);
+}
+
+void DoctorHomePage::setupDoctorAdvice()
+{
+    DoctorWindow *pw = new DoctorWindow(&MedLink::instance(), this);
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(4));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(pw);
 }
 
 void DoctorHomePage::setupButtons()

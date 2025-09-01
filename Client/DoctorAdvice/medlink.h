@@ -1,19 +1,19 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef MEDLINK_H
+#define MEDLINK_H
 
 #include <QObject>
 #include <QTcpSocket>
 #include <QJsonObject>
 
-class Client : public QObject {
+class MedLink : public QObject {
     Q_OBJECT
 public:
-    explicit Client(QObject *parent = 0);
-
+    explicit MedLink(QObject *parent = 0);
+    static MedLink& instance();
     void connectToServer(const QString &host="127.0.0.1", quint16 port=5555);
     bool isConnected() const;
-
     void sendJson(const QJsonObject &obj);
+    void onReadyRead(const QJsonObject &reply);
 
 signals:
     void jsonReceived(const QJsonObject &obj);
@@ -21,7 +21,6 @@ signals:
     void errorText(const QString &msg);
 
 private slots:
-    void onReadyRead();
     void onConnected();
     void onError(QAbstractSocket::SocketError);
 

@@ -33,6 +33,7 @@ private:
     void setupSessionForm();
     void setupMessage();
     void setupAI();
+    void setupDoctorAdvice();
 };
 
 #endif // HOMEPAGE_H

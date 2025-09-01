@@ -1,69 +1,68 @@
 #include "orderdetaildialog.h"
+#include "ui_theme.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QJsonArray>
+#include <QGroupBox>
+#include <QGridLayout>
 
-OrderDetailDialog::OrderDetailDialog(Client *client,
+OrderDetailDialog::OrderDetailDialog(MedLink *client,
                                      const QJsonObject &orderObj,
                                      bool editable,
                                      QWidget *parent)
     : QDialog(parent), client_(client), data_(orderObj), editable_(editable)
 {
-    setWindowTitle("医嘱详情");
+    setWindowTitle(editable ? "医嘱详情 / 编辑" : "医嘱详情（只读）");
+    resize(760, 540);
+    UiTheme::apply(this);
+
     orderId_ = orderObj.value("id").toInt();
 
     QVBoxLayout *lay = new QVBoxLayout(this);
+    lay->setContentsMargins(18,18,18,18);
+    lay->setSpacing(14);
 
-    QHBoxLayout *r1 = new QHBoxLayout;
-    r1->addWidget(new QLabel("ID:"));
-    editId_ = new QLineEdit(QString::number(orderId_), this);
-    editId_->setReadOnly(true);
-    r1->addWidget(editId_);
+    QGroupBox *info = new QGroupBox("基本信息", this);
+    QGridLayout *g = new QGridLayout(info); g->setHorizontalSpacing(12); g->setVerticalSpacing(10);
 
-    r1->addWidget(new QLabel("患者ID:"));
-    editPatient_ = new QLineEdit(orderObj.value("patient_id").toString(), this);
-    editPatient_->setReadOnly(true);
-    r1->addWidget(editPatient_);
+    g->addWidget(new QLabel("ID:"), 0, 0);
+    editId_ = new QLineEdit(QString::number(orderId_), this); editId_->setReadOnly(true);
+    g->addWidget(editId_, 0, 1);
 
-    r1->addWidget(new QLabel("医生ID:"));
-    editDoctor_ = new QLineEdit(orderObj.value("doctor_id").toString(), this);
-    editDoctor_->setReadOnly(true);
-    r1->addWidget(editDoctor_);
-    lay->addLayout(r1);
+    g->addWidget(new QLabel("患者ID:"), 0, 2);
+    editPatient_ = new QLineEdit(orderObj.value("patient_id").toString(), this); editPatient_->setReadOnly(true);
+    g->addWidget(editPatient_, 0, 3);
 
-    QHBoxLayout *r2 = new QHBoxLayout;
-    r2->addWidget(new QLabel("科室:"));
+    g->addWidget(new QLabel("医生ID:"), 1, 0);
+    editDoctor_ = new QLineEdit(orderObj.value("doctor_id").toString(), this); editDoctor_->setReadOnly(true);
+    g->addWidget(editDoctor_, 1, 1);
+
+    g->addWidget(new QLabel("创建时间:"), 1, 2);
+    editCreatedAt_ = new QLineEdit(orderObj.value("created_at").toString(), this); editCreatedAt_->setReadOnly(true);
+    g->addWidget(editCreatedAt_, 1, 3);
+
+    g->addWidget(new QLabel("科室:"), 2, 0);
     comboDept_ = new QComboBox(this);
-    comboDept_->addItem("内科");
-    comboDept_->addItem("外科");
-    comboDept_->addItem("儿科");
-    comboDept_->addItem("骨科");
-    comboDept_->addItem("急诊");
-    comboDept_->addItem("全部"); // 给个兜底
-    int idx = comboDept_->findText(orderObj.value("dept").toString());
-    if (idx < 0) idx = comboDept_->findText("全部");
+    comboDept_->addItems(QStringList() << "内科" << "外科" << "儿科" << "骨科" << "急诊" << "全部");
+    int idx = comboDept_->findText(orderObj.value("dept").toString()); if (idx < 0) idx = comboDept_->findText("全部");
     comboDept_->setCurrentIndex(idx);
-    r2->addWidget(comboDept_);
+    g->addWidget(comboDept_, 2, 1, 1, 3);
 
-    r2->addWidget(new QLabel("创建时间:"));
-    editCreatedAt_ = new QLineEdit(orderObj.value("created_at").toString(), this);
-    editCreatedAt_->setReadOnly(true);
-    r2->addWidget(editCreatedAt_);
-    lay->addLayout(r2);
+    lay->addWidget(info);
 
-    editContent_ = new QPlainTextEdit(orderObj.value("content").toString(), this);
-    editContent_->setPlaceholderText("医嘱内容");
-    lay->addWidget(editContent_);
+    QGroupBox *contentBox = new QGroupBox("医嘱内容", this);
+    QVBoxLayout *cl = new QVBoxLayout(contentBox);
+    editContent_ = new QPlainTextEdit(this); editContent_->setPlaceholderText("医嘱内容");
+    editContent_->setPlainText(orderObj.value("content").toString());
+    cl->addWidget(editContent_);
+    lay->addWidget(contentBox, 1);
 
     QHBoxLayout *btns = new QHBoxLayout;
     btnSave_ = new QPushButton("保存修改", this);
-    btnDelete_ = new QPushButton("删除", this);
-    btnClose_ = new QPushButton("关闭", this);
-    btns->addWidget(btnSave_);
-    btns->addWidget(btnDelete_);
-    btns->addStretch(1);
-    btns->addWidget(btnClose_);
+    btnDelete_ = new QPushButton("删除", this); btnDelete_->setObjectName("danger");
+    btnClose_ = new QPushButton("关闭", this); btnClose_->setObjectName("secondary");
+    btns->addWidget(btnSave_); btns->addWidget(btnDelete_); btns->addStretch(1); btns->addWidget(btnClose_);
     lay->addLayout(btns);
 
     if (!editable_) {
@@ -71,7 +70,6 @@ OrderDetailDialog::OrderDetailDialog(Client *client,
         btnDelete_->setEnabled(false);
         comboDept_->setEnabled(false);
         editContent_->setReadOnly(true);
-        setWindowTitle("医嘱详情（只读）");
     }
 
     connect(btnSave_, SIGNAL(clicked()), this, SLOT(onSave()));
@@ -82,20 +80,15 @@ OrderDetailDialog::OrderDetailDialog(Client *client,
 
 void OrderDetailDialog::onSave() {
     if (!editable_) return;
-    QJsonObject o;
-    o.insert("type", "update_order");
-    o.insert("id", orderId_);
-    o.insert("dept", comboDept_->currentText());
-    o.insert("content", editContent_->toPlainText());
+    QJsonObject o; o.insert("type","update_order"); o.insert("id", orderId_);
+    o.insert("dept", comboDept_->currentText()); o.insert("content", editContent_->toPlainText());
     client_->sendJson(o);
 }
 
 void OrderDetailDialog::onDelete() {
     if (!editable_) return;
     if (QMessageBox::question(this, "确认删除", "确定要删除这条医嘱吗？") != QMessageBox::Yes) return;
-    QJsonObject o;
-    o.insert("type", "delete_order");
-    o.insert("id", orderId_);
+    QJsonObject o; o.insert("type","delete_order"); o.insert("id", orderId_);
     client_->sendJson(o);
 }
 
@@ -103,24 +96,11 @@ void OrderDetailDialog::onJson(const QJsonObject &obj) {
     QString type = obj.value("type").toString();
     if (type == "update_order_result") {
         if (obj.value("id").toInt() != orderId_) return;
-        bool ok = obj.value("ok").toBool();
-        if (ok) {
-            QMessageBox::information(this, "成功", "已保存修改。");
-            emit orderChanged();
-            accept();
-        } else {
-            QMessageBox::warning(this, "失败", "保存失败：" + obj.value("error").toString());
-        }
+        if (obj.value("ok").toBool()) { QMessageBox::information(this,"成功","已保存修改。"); emit orderChanged(); accept(); }
+        else { QMessageBox::warning(this,"失败","保存失败："+obj.value("error").toString()); }
     } else if (type == "delete_order_result") {
         if (obj.value("id").toInt() != orderId_) return;
-        bool ok = obj.value("ok").toBool();
-        if (ok) {
-            QMessageBox::information(this, "成功", "已删除。");
-            emit orderChanged();
-            accept();
-        } else {
-            QMessageBox::warning(this, "失败", "删除失败：" + obj.value("error").toString());
-        }
+        if (obj.value("ok").toBool()) { QMessageBox::information(this,"成功","已删除。"); emit orderChanged(); accept(); }
+        else { QMessageBox::warning(this,"失败","删除失败："+obj.value("error").toString()); }
     }
 }
-

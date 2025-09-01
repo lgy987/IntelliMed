@@ -16,6 +16,7 @@ public:
     void connectToServer(const QString &host = "127.0.0.1", quint16 port = 12345);
     void disconnectFromServer();
 
+    void send(const QJsonObject &req);
     void sendLogin(const QString &username, const QString &password, bool remember);
     void sendTokenLogin(const QString &username, const QString &token);
     void sendSignUp(const QString &username, const QString &password, const QString &email);

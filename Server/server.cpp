@@ -152,6 +152,8 @@ QJsonObject Server::handleAction(QTcpSocket* client, const QJsonObject &request)
         return handleGetMessages(request);
     } else if (action == "sendMessage") {
         return handleSendMessage(request);
+    } else if (action == "doctoradvice") {
+        return forwardDoctorAdviceRequest(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -1106,4 +1108,15 @@ void Server::callAI(QTcpSocket *client, int senderPatientId, const QString &user
         reply->deleteLater();
         reply->manager()->deleteLater();
     });
+}
+
+QJsonObject Server::forwardDoctorAdviceRequest(const QJsonObject &actionRequest) {
+
+    QJsonObject request = actionRequest.value("content").toObject();
+    qDebug().noquote() << QJsonDocument(request).toJson(QJsonDocument::Indented);
+    QJsonObject response = doctorAdviceServer.handleRequest(request);
+    QJsonObject wrapper;
+    wrapper["action"] = "doctoradvice";
+    wrapper["content"] = response;
+    return wrapper;
 }

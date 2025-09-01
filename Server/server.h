@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+#include "doctoradviceserver.h"
+
 class Server : public QTcpServer {
     Q_OBJECT
 
@@ -54,4 +56,8 @@ private:
     // Messaging
     QJsonObject handleGetMessages(const QJsonObject &request);
     QJsonObject handleSendMessage(const QJsonObject &request);
+
+    //DoctorAdvice
+    DoctorAdviceServer doctorAdviceServer;
+    QJsonObject forwardDoctorAdviceRequest(const QJsonObject &actionRequest);
 };

@@ -48,7 +48,7 @@
       <item>
        <widget class="QPushButton" name="btnHealth">
         <property name="text">
-         <string>❤️ 【空页】</string>
+         <string>💊 医嘱管理</string>
         </property>
        </widget>
       </item>

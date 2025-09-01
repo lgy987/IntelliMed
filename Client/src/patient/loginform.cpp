@@ -80,7 +80,7 @@ void LoginForm::handleLoginResponse(const QJsonObject &obj)
 {
     if (obj["status"].toString() == "ok") {
         QString token = obj.value("token").toString();
-        QString userId = obj.value("userId").toString();
+        QString userId = QString::number(obj.value("userId").toInt());
         QString username = ui->usernameEdit->text();
 
         // Save session if "Remember Me" checked

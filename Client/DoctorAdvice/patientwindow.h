@@ -7,12 +7,18 @@
 #include <QTableWidget>
 #include <QJsonObject>
 #include <QJsonArray>
-#include "client.h"
+#include "medlink.h"
+
+//全局变量uID
+//extern QString uID;
 
 class PatientWindow : public QWidget {
     Q_OBJECT
 public:
-    explicit PatientWindow(Client *client, const QString &patientId, QWidget *parent = 0);
+    explicit PatientWindow(MedLink *link, QWidget *parent = 0);
+
+signals:
+    void backRequested();
 
 private slots:
     void refreshOrders();
@@ -20,8 +26,10 @@ private slots:
     void onCellDoubleClicked(int row, int col);
 
 private:
-    Client *client_;
+    MedLink *link_;
     QString patientId_;
+
+    QPushButton *btnBack_;
     QLineEdit *editPatientId_;
     QPushButton *btnRefresh_;
     QTableWidget *table_;

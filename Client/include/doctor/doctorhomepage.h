@@ -31,6 +31,7 @@ private:
     void setupPersonalInfoForm();
     void setupSessionForm();
     void setupMessage();
+    void setupDoctorAdvice();
 };
 
 #endif // HOMEPAGE_H

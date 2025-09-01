@@ -13,13 +13,19 @@
 #include <QCheckBox>
 #include <QJsonObject>
 #include <QJsonArray>
-#include "client.h"
+#include "medlink.h"
+
+// 全局用户ID
+//extern QString uID;
 
 class DoctorWindow : public QWidget {
     Q_OBJECT
 public:
-    explicit DoctorWindow(Client *client, const QString &doctorId,
-                          const QString &doctorName, QWidget *parent = 0);
+    // 登录已删除：直接用全局 uID 当医生ID
+    explicit DoctorWindow(MedLink *link, QWidget *parent = 0);
+
+signals:
+    void backRequested();
 
 private slots:
     void createOrder();
@@ -33,12 +39,12 @@ private:
     void sendListQuery();
 
 private:
-    Client *client_;
-    QString doctorId_;
-    QString doctorName_;
+    MedLink *link_;
 
+    QPushButton *btnBack_;
 
-    QLineEdit *editPatientId_;
+    QLineEdit *editDoctorId_;    // 由 uID 预填（只读）
+    QLineEdit *editPatientId_;   // 查询患者ID（可编辑）
     QComboBox *comboDept_;
     QLineEdit *editKeyword_;
     QCheckBox *chkUseDate_;
@@ -48,7 +54,6 @@ private:
     QPushButton *btnPrev_;
     QPushButton *btnNext_;
     QLabel *lblPage_;
-
 
     QPlainTextEdit *editContent_;
     QPushButton *btnCreate_;
@@ -61,4 +66,5 @@ private:
     QList<QJsonObject> items_;
     QString lastRequestedPatientId_;
 };
+
 #endif

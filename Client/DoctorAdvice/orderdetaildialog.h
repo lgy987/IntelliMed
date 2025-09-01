@@ -8,25 +8,26 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QJsonObject>
-#include "client.h"
+#include "medlink.h"
 
 class OrderDetailDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit OrderDetailDialog(Client *client,
+    explicit OrderDetailDialog(MedLink *client,
                                const QJsonObject &orderObj,
                                bool editable,
                                QWidget *parent = 0);
 
 signals:
     void orderChanged();
+
 private slots:
     void onSave();
     void onDelete();
     void onJson(const QJsonObject &obj);
 
 private:
-    Client *client_;
+    MedLink *client_;
     QJsonObject data_;
     bool editable_;
     int orderId_;

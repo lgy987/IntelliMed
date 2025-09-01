@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QDebug>
+#include "dadb.h"
 
 DoctorAdviceServer::DoctorAdviceServer(QObject *parent)
     : QTcpServer(parent) {}
@@ -17,12 +18,7 @@ bool DoctorAdviceServer::start() {
 QJsonObject DoctorAdviceServer::handleRequest(const QJsonObject &request) {
     QJsonObject response;
 
-    // reuse your existing handler logic by mocking a "fake socket"
-    handleJson(nullptr, request);  // handleJson will produce output only via sendJson
-    // Since sendJson expects QTcpSocket*, we can also create a helper that returns QJsonObject
-    // Better: implement a new handleJsonInternal function:
-
-    QString type = request.value("type").toString();
+    const QString type = request.value("type").toString();
 
     if (type == "login") {
         const QString id = request.value("id").toString();
@@ -35,17 +31,20 @@ QJsonObject DoctorAdviceServer::handleRequest(const QJsonObject &request) {
         response.insert("id", id);
         response.insert("name", name);
         response.insert("role", role);
+
     } else if (type == "create_order") {
         const QString patientId = request.value("patient_id").toString();
         const QString doctorId  = request.value("doctor_id").toString();
         const QString dept      = request.value("dept").toString();
         const QString content   = request.value("content").toString();
         QString err;
+        qDebug() << patientId << doctorId<<dept<<content;
         bool ok = db_.createOrder(patientId, doctorId, dept, content, &err);
 
         response.insert("type", "create_order_result");
         response.insert("ok", ok);
         response.insert("error", ok ? "" : err);
+
     } else if (type == "list_orders") {
         const QString patientId = request.value("patient_id").toString();
         const QString keyword   = request.value("keyword").toString();
@@ -67,6 +66,7 @@ QJsonObject DoctorAdviceServer::handleRequest(const QJsonObject &request) {
         response.insert("page", page);
         response.insert("page_size", pageSize);
         response.insert("items", arrDoc.array());
+
     } else if (type == "update_order") {
         int id = request.value("id").toInt();
         const QString dept = request.value("dept").toString();
@@ -78,6 +78,7 @@ QJsonObject DoctorAdviceServer::handleRequest(const QJsonObject &request) {
         response.insert("ok", ok);
         response.insert("id", id);
         response.insert("error", ok ? "" : err);
+
     } else if (type == "delete_order") {
         int id = request.value("id").toInt();
         QString err;
@@ -87,6 +88,7 @@ QJsonObject DoctorAdviceServer::handleRequest(const QJsonObject &request) {
         response.insert("ok", ok);
         response.insert("id", id);
         response.insert("error", ok ? "" : err);
+
     } else {
         response.insert("type", "error");
         response.insert("message", "unknown_type");

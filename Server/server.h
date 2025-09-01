@@ -4,7 +4,6 @@
 #include <QTcpSocket>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include "doctoradviceserver.h"
 
 class Server : public QTcpServer {
     Q_OBJECT
@@ -35,8 +34,10 @@ private:
     QJsonObject handleGetPersonalInfo(const QJsonObject &request);
     QJsonObject handleUpdatePersonalInfo(const QJsonObject &request);
     QJsonObject handleGetSessionInfo(const QJsonObject &request);
+    void handleAISendMessage(QTcpSocket* client, const QJsonObject &request);
     int checkToken(const QString &token);
     QString getPatientToken(int id);
+    void callAI(QTcpSocket *client, int senderPatientId, const QString &userMessage);
 
     // Doctor handling
     QJsonObject handleDoctorLogin(QTcpSocket *client, const QJsonObject &request);
@@ -53,8 +54,4 @@ private:
     // Messaging
     QJsonObject handleGetMessages(const QJsonObject &request);
     QJsonObject handleSendMessage(const QJsonObject &request);
-
-    // Doctor advice server
-    DoctorAdviceServer doctorAdviceServer;
-    QJsonObject forwardDoctorAdviceRequest(const QJsonObject &actionRequest);
 };

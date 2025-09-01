@@ -4,7 +4,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
-#include "ai.h"
 
 bool initDatabase() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -103,8 +102,6 @@ int main(int argc, char *argv[]) {
 
     initDatabase();
     Server server;
-
-    Ai::callAI("你好");
 
     return a.exec();
 }

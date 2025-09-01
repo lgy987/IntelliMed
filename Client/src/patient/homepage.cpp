@@ -15,6 +15,7 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     setupPersonalInfoForm();
     setupSessionForm();
     setupMessage();
+    setupAI();
     QVBoxLayout* sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -72,6 +73,15 @@ void HomePage::setupMessage()
     QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(2));
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(msg);
+}
+
+void HomePage::setupAI()
+{
+    Message *AImsg = new Message(0, false, this);
+    // Add it to the stacked page layout
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(3));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(AImsg);
 }
 
 void HomePage::setupButtons()

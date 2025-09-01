@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,7 +32,6 @@ SOURCES += \
     src/patient/signupform.cpp \
     src/patient/sessionform.cpp \
     src/patient/message.cpp \
-    src/patient/moodrecorder.cpp \
     src/network/networkmanager.cpp
 
 # Headers

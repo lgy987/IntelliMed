@@ -32,6 +32,7 @@ private:
     void setupPersonalInfoForm();
     void setupSessionForm();
     void setupMessage();
+    void setupAI();
 };
 
 #endif // HOMEPAGE_H

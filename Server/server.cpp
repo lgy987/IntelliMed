@@ -6,8 +6,13 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include "doctoradviceserver.h"
 #include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 Server::Server(QObject *parent) : QTcpServer(parent) {
     if (!listen(QHostAddress::Any, 12345)) {
@@ -75,6 +80,16 @@ void Server::onReadyRead() {
         if (!doc.isObject()) continue;
 
         QJsonObject request = doc.object();
+
+        QString action = request["action"].toString();
+        if (action == "sendMessage") {
+            int partnerId = request["partner_id"].toInt();
+            if(partnerId == 0){
+                handleAISendMessage(client, request);
+                return;
+            }
+        }
+
         QJsonObject reply = handleAction(client, request);
 
         sendResponse(client, reply);
@@ -137,8 +152,6 @@ QJsonObject Server::handleAction(QTcpSocket* client, const QJsonObject &request)
         return handleGetMessages(request);
     } else if (action == "sendMessage") {
         return handleSendMessage(request);
-    } else if (action == "doctorAdvice") {
-        return forwardDoctorAdviceRequest(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -816,7 +829,7 @@ QJsonObject Server::handleGetMessages(const QJsonObject &request) {
         doctorId = request["partner_id"].toInt();
     }
 
-    if (doctorId <= 0 || patientId <= 0) {
+    if (doctorId < 0 || patientId <= 0) {
         reply["status"] = "error";
         reply["message"] = "无效的ID";
         return reply;
@@ -875,7 +888,7 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
         senderType = "patient";
     } else {
         senderDoctorId = checkDoctorToken(token);
-        if (senderDoctorId > 0) {
+        if (senderDoctorId >= 0) {
             senderType = "doctor";
         } else {
             reply["status"] = "error";
@@ -949,19 +962,146 @@ QString Server::getDoctorToken(int id) {
     return QString(); // empty string if not found
 }
 
+void Server::handleAISendMessage(QTcpSocket *client, const QJsonObject &request) {
+    QJsonObject reply;
+    QString token = request["token"].toString();
+    QString messageText = request["message"].toString();
+
+    int partnerId = request["partner_id"].toInt(-1);
+    if (partnerId != 0) {
+        reply["status"] = "error";
+        reply["message"] = "错误消息对象";
+        sendResponse(client, reply);
+        return;
+    }
+
+    if (messageText.isEmpty()) {
+        reply["status"] = "error";
+        reply["message"] = "消息不能为空";
+        sendResponse(client, reply);
+        return;
+    }
+
+    int senderPatientId = checkToken(token);
+    QString senderType;
+
+    if (senderPatientId > 0) {
+        senderType = "patient";
+    } else {
+        reply["status"] = "error";
+        reply["message"] = "无效的token，请重新登录";
+        sendResponse(client, reply);
+        return;
+    }
+
+    int recipientDoctorId  = 0;
+
+    // Save message to DB
+    QSqlQuery query;
+    query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
+                  "VALUES (:doctorId, :patientId, :senderType, :message)");
+    query.bindValue(":doctorId", recipientDoctorId);
+    query.bindValue(":patientId", senderPatientId);
+    query.bindValue(":senderType", senderType);
+    query.bindValue(":message", messageText);
+
+    if (!query.exec()) {
+        reply["status"] = "error";
+        reply["message"] = "消息发送失败: " + query.lastError().text();
+        sendResponse(client, reply);
+        return;
+    }
+
+    // Reply to sender
+    reply["action"] = "sendMessage";
+    reply["status"] = "success";
+    reply["sender_type"] = senderType;
+    reply["message"] = messageText;
+    sendResponse(client, reply);
+
+    callAI(client, senderPatientId, messageText);
+
+    return;
+}
+
 QString Server::generateToken() {
     QByteArray randomBytes = QUuid::createUuid().toByteArray();
     QString token = QCryptographicHash::hash(randomBytes, QCryptographicHash::Sha256).toHex();
     return token;
 }
 
+void Server::callAI(QTcpSocket *client, int senderPatientId, const QString &userMessage) {
+    auto *manager = new QNetworkAccessManager();
 
-QJsonObject Server::forwardDoctorAdviceRequest(const QJsonObject &actionRequest) {
-    // actionRequest: {"action":"doctorAdvice", "request": {...}}
-    if (actionRequest.value("action").toString() != "doctorAdvice")
-        return QJsonObject{{"type", "error"}, {"message", "invalid_action"}};
 
-    QJsonObject request = actionRequest.value("request").toObject();
-    QJsonObject response = doctorAdviceServer.handleRequest(request);
-    return response;
+    QUrl url("https://open.bigmodel.cn/api/paas/v4/chat/completions");
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", "Bearer 9195e9ac6f404632af0af3ea22564aa6.Kf1CWR7vBpz9K6jK");
+
+    QJsonObject systemMessage;
+    systemMessage["role"] = "system";
+    systemMessage["content"] = "You are a medical assistant in a healthcare app. "
+                               "Provide helpful, polite advice to patients. "
+                               "Do not give definite diagnoses. "
+                               "Always recommend seeing a doctor if necessary.";
+
+    // User message: the actual patient input
+    QJsonObject userMessageObj;
+    userMessageObj["role"] = "user";
+    userMessageObj["content"] = userMessage;
+
+    // Build messages array
+    QJsonArray messages;
+    messages.append(systemMessage);
+    messages.append(userMessageObj);
+
+    QJsonObject body;
+    body["model"] = "glm-4.5";
+    body["messages"] = messages;
+    body["temperature"] = 0.6;
+    body["max_tokens"] = 1024;
+
+    QNetworkReply *reply = manager->post(request, QJsonDocument(body).toJson());
+
+    QObject::connect(reply, &QNetworkReply::finished, [this, reply, client, senderPatientId]() {
+        QString aiReply;
+
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray data = reply->readAll();
+            QJsonDocument doc = QJsonDocument::fromJson(data);
+            QJsonObject obj = doc.object();
+
+            QJsonArray choices = obj["choices"].toArray();
+            if (!choices.isEmpty()) {
+                aiReply = choices[0].toObject()["message"].toObject()["content"].toString();
+            } else {
+                aiReply = "I don't know how to reply";
+            }
+        } else {
+            aiReply = "[Error: AI request failed]";
+        }
+
+        // Save AI message to DB
+        QSqlQuery query;
+        query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
+                      "VALUES (:doctorId, :patientId, :senderType, :message)");
+        query.bindValue(":doctorId", 0);
+        query.bindValue(":patientId", senderPatientId);
+        query.bindValue(":senderType", "doctor");
+        query.bindValue(":message", aiReply);
+        query.exec();
+
+        // Send response to client
+        QJsonObject response;
+        response["action"] = "sendMessage";
+        response["status"] = "success";
+        response["sender_type"] = "doctor";
+        response["message"] = aiReply;
+
+        sendResponse(client, response);
+
+        reply->deleteLater();
+        reply->manager()->deleteLater();
+    });
 }

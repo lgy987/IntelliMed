@@ -27,28 +27,28 @@
       <item>
        <widget class="QPushButton" name="btnAppointment">
         <property name="text">
-         <string>📅 当前会诊</string>
+         <string>🩺 当前会诊</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnCases">
         <property name="text">
-         <string>📄 线上对话</string>
+         <string>💬 线上对话</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnOrders">
         <property name="text">
-         <string>💊 医嘱管理</string>
+         <string>🤖 AI助手</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnHealth">
         <property name="text">
-         <string>❤️ 健康评估</string>
+         <string>❤️ 【空页】</string>
         </property>
        </widget>
       </item>

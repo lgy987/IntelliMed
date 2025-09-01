@@ -6,6 +6,7 @@
 #include "session.h"
 #include "../DoctorAdvice/patientwindow.h"
 #include "../DoctorAdvice/medlink.h"
+#include <QLabel>
 
 
 HomePage::HomePage(QWidget *loginForm, QWidget *parent)
@@ -14,6 +15,59 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     , loginForm(loginForm)
 {
     ui->setupUi(this);
+    ui->statusbar->hide();
+
+    // 1. Create the container for the right side (top bar + stacked widget)
+    QWidget *rightContainer = new QWidget(ui->centralwidget);
+    QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
+    rightLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->setSpacing(0);
+
+    // 2. Create the transparent top bar
+    QWidget *topBar = new QWidget(rightContainer);
+    topBar->setFixedHeight(50);
+    topBar->setStyleSheet("background-color: transparent;");
+
+    QHBoxLayout *topBarLayout = new QHBoxLayout(topBar);
+    topBarLayout->setContentsMargins(10, 0, 10, 0);
+    topBarLayout->setSpacing(10);
+
+    // 3. Add a stretch to push content to the right
+    topBarLayout->addStretch();
+
+    // 4. Username label (normal font, slightly larger)
+    QLabel *usernameLabel = new QLabel(Session::instance().username(), topBar);
+    usernameLabel->setStyleSheet("color: #000000; font-size: 14px;");
+
+    // 5. Logout button
+    QPushButton *btnLogout = new QPushButton("登出", topBar);
+    btnLogout->setFlat(true);
+    btnLogout->setStyleSheet(R"(
+    QPushButton {
+        color: #000000;
+        background-color: transparent;
+        border: none;
+        font-size: 14px;
+    }
+    QPushButton:hover {
+        color: #2193F3;
+    }
+)");
+
+    // 6. Add label and button to layout
+    topBarLayout->addWidget(usernameLabel);
+    topBarLayout->addSpacing(10); // small gap between label and button
+    topBarLayout->addWidget(btnLogout);
+
+    // 7. Add top bar and stacked widget to the vertical layout
+    rightLayout->addWidget(topBar);
+    rightLayout->addWidget(ui->stackedPages);
+
+    // 8. Replace the original stacked widget in horizontal layout
+    QLayoutItem *oldItem = ui->horizontalLayout_main->takeAt(1);
+    if (oldItem) delete oldItem;
+    ui->horizontalLayout_main->addWidget(rightContainer);
+
     setupButtons();
     setupPersonalInfoForm();
     setupSessionForm();
@@ -26,7 +80,7 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
         sidebarLayout->setSpacing(4);                 // spacing between buttons
     }
 
-    connect(ui->btnLogout, &QPushButton::clicked, this, &HomePage::handleLogout);
+    connect(btnLogout, &QPushButton::clicked, this, &HomePage::handleLogout);
 }
 
 HomePage::~HomePage()
@@ -127,7 +181,7 @@ void HomePage::setupButtons()
     )";
 
     buttons = { ui->btnUser, ui->btnAppointment, ui->btnCases,
-               ui->btnOrders, ui->btnHealth, ui->btnLogout };
+               ui->btnOrders, ui->btnHealth};
 
     for (int i = 0; i < buttons.size(); ++i) {
         QPushButton* btn = buttons[i];

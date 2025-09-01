@@ -53,13 +53,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnLogout">
-        <property name="text">
-         <string>登出</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Orientation::Vertical</enum>

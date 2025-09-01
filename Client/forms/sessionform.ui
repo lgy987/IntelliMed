@@ -15,36 +15,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
 
-   <!-- Top Spacer -->
-   <item>
-    <spacer name="topSpacer">
-     <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
-     <property name="sizeHint" stdset="0">
-      <size><width>20</width><height>20</height></size>
-     </property>
-    </spacer>
-   </item>
-
-   <!-- Centered No Session Label -->
-   <item>
-    <spacer>
-     <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QLabel" name="noSessionLabel">
-     <property name="text"><string>当前没有会诊记录</string></property>
-     <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="visible"><bool>false</bool></property>
-     <property name="styleSheet"><string notr="true">QLabel { font-size:16px; color:#6b7280; }</string></property>
-    </widget>
-   </item>
-   <item>
-    <spacer>
-     <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
-    </spacer>
-   </item>
-
    <!-- Cards Container -->
    <item>
     <widget class="QWidget" name="cardsWidget">
@@ -164,6 +134,27 @@
           </item>
          </layout>
         </item>
+
+<!-- Centered No Session Label -->
+<item>
+ <spacer>
+  <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
+ </spacer>
+</item>
+<item>
+ <widget class="QLabel" name="noSessionLabel">
+  <property name="text"><string>当前没有会诊记录</string></property>
+  <property name="alignment"><set>Qt::AlignCenter</set></property>
+  <property name="visible"><bool>false</bool></property>
+  <property name="styleSheet"><string notr="true">QLabel { font-size:16px; color:#6b7280; }</string></property>
+ </widget>
+</item>
+<item>
+ <spacer>
+  <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
+ </spacer>
+</item>
+
         <item>
          <widget class="QPushButton" name="messageButton">
           <property name="styleSheet">

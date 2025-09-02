@@ -17,6 +17,17 @@
    <layout class="QHBoxLayout" name="horizontalLayout_main">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_sidebar">
+     <item>
+      <widget class="QLabel" name="labelImage">
+     <property name="pixmap">
+      <pixmap>:/img/label.png</pixmap>
+     </property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="scaledContents"><bool>true</bool></property>
+     <property name="maximumHeight"><number>80</number></property>
+     <property name="maximumWidth"><number>108</number></property>
+    </widget>
+     </item>
       <item>
        <widget class="QPushButton" name="btnUser">
         <property name="text">

@@ -20,19 +20,8 @@ PatientWindow::PatientWindow(MedLink *link, QWidget *parent)
     UiTheme::apply(this);
 
     QVBoxLayout *root = new QVBoxLayout(this);
-    root->setContentsMargins(16,16,16,16);
+    root->setContentsMargins(0,0,0,0);
     root->setSpacing(12);
-
-    QFrame *appbar = new QFrame(this);
-    appbar->setObjectName("appBar");
-    QHBoxLayout *head = new QHBoxLayout(appbar);
-    QLabel *title = new QLabel("我的医嘱", appbar);
-    QFont f = title->font(); f.setPointSize(18); f.setBold(true); title->setFont(f);
-    head->addWidget(title); head->addStretch(1);
-    btnBack_ = new QPushButton("返回", appbar); btnBack_->setObjectName("ghost");
-    head->addWidget(btnBack_);
-    root->addWidget(appbar);
-    connect(btnBack_, SIGNAL(clicked()), this, SIGNAL(backRequested()));
 
     QGroupBox *bar = new QGroupBox("查询", this);
     QHBoxLayout *barLay = new QHBoxLayout(bar);

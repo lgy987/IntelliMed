@@ -47,7 +47,7 @@ DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
         font-size: 14px;
     }
     QPushButton:hover {
-        color: #2193F3;
+        color: #06b6d4;
     }
 )");
 
@@ -161,7 +161,7 @@ void DoctorHomePage::setupButtons()
             padding: 10px;
             margin: 0px;
             border-radius: 5px;
-            background-color: #06b6d4; /* modern blue */
+            background-color: #06b6d4; /* modern cyan */
             text-align: left;
         }
     )";

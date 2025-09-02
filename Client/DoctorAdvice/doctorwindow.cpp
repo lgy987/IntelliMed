@@ -22,22 +22,9 @@ DoctorWindow::DoctorWindow(MedLink *link, QWidget *parent)
     UiTheme::apply(this);
 
     QVBoxLayout *root = new QVBoxLayout(this);
-    root->setContentsMargins(20,20,20,20);
+    root->setContentsMargins(0,0,0,0);
     root->setSpacing(16);
 
-
-    QFrame *appbar = new QFrame(this);
-    appbar->setObjectName("appBar");
-    QHBoxLayout *top = new QHBoxLayout(appbar);
-    QLabel *title = new QLabel("医嘱管理", appbar);
-    QFont f = title->font(); f.setPointSize(20); f.setBold(true); title->setFont(f);
-    top->addWidget(title);
-    top->addStretch(1);
-    btnBack_ = new QPushButton("返回", appbar);
-    btnBack_->setObjectName("ghost");
-    top->addWidget(btnBack_);
-    root->addWidget(appbar);
-    connect(btnBack_, SIGNAL(clicked()), this, SIGNAL(backRequested()));
 
     QSplitter *split = new QSplitter(Qt::Horizontal, this);
     split->setHandleWidth(12);

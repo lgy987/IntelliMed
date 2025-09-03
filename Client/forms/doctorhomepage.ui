@@ -43,7 +43,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnCases">
+       <widget class="QPushButton" name="btnMessage">
         <property name="text">
          <string>💬 线上对话</string>
         </property>
@@ -52,7 +52,7 @@
       <item>
        <widget class="QPushButton" name="btnOrders">
         <property name="text">
-         <string>💊 【空页】</string>
+         <string>❤️ 健康评估</string>
         </property>
        </widget>
       </item>
@@ -64,9 +64,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnLogout">
+       <widget class="QPushButton" name="btnCases">
         <property name="text">
-         <string>登出</string>
+         <string>💊 病例管理</string>
         </property>
        </widget>
       </item>

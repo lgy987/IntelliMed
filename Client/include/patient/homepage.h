@@ -34,6 +34,8 @@ private:
     void setupMessage();
     void setupAI();
     void setupDoctorAdvice();
+    void setupHealthAssess();
+    void setupCases();
 };
 
 #endif // HOMEPAGE_H

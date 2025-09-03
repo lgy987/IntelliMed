@@ -1,4 +1,4 @@
-#include "DatabaseManager.h"
+#include "hadb.h"
 #include <QDir>
 #include <QStandardPaths>
 #include <QSqlRecord>
@@ -24,7 +24,7 @@ DatabaseManager::~DatabaseManager()
 bool DatabaseManager::initializeDatabase()
 {
     // 创建SQLite数据库连接
-    m_database = QSqlDatabase::addDatabase("QSQLITE");
+    m_database = QSqlDatabase::addDatabase("QSQLITE", "healthassess");
     m_database.setDatabaseName(m_databasePath);
     
     if (!m_database.open()) {
@@ -47,7 +47,8 @@ bool DatabaseManager::initializeDatabase()
 
 bool DatabaseManager::createTables()
 {
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("healthassess");
+    QSqlQuery query(usersDb);
     
     // 创建患者问卷数据表
     QString createTableSQL = 
@@ -85,7 +86,8 @@ bool DatabaseManager::insertPatientData(const QString &name, int age, const QStr
         return false;
     }
     
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("healthassess");
+    QSqlQuery query(usersDb);
     query.prepare(
         "INSERT INTO patient_assessments "
         "(name, age, gender, height, weight, phone, bmi, bmi_status, lifestyle_choices, health_score) "
@@ -121,7 +123,9 @@ QList<QMap<QString, QVariant>> DatabaseManager::getPatientData()
         return patientList;
     }
     
-    QSqlQuery query("SELECT * FROM patient_assessments ORDER BY submission_time DESC");
+    QSqlDatabase usersDb = QSqlDatabase::database("healthassess");
+    QSqlQuery query(usersDb);
+    query.exec("SELECT * FROM patient_assessments ORDER BY submission_time DESC");
     
     while (query.next()) {
         QMap<QString, QVariant> patient;
@@ -146,7 +150,8 @@ QMap<QString, QVariant> DatabaseManager::getPatientByName(const QString &name)
         return patient;
     }
     
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("healthassess");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT * FROM patient_assessments WHERE name = ? ORDER BY submission_time DESC LIMIT 1");
     query.addBindValue(name);
     
@@ -169,7 +174,8 @@ QMap<QString, QVariant> DatabaseManager::getPatientByPhone(const QString &phone)
         return patient;
     }
     
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("healthassess");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT * FROM patient_assessments WHERE phone = ? ORDER BY submission_time DESC LIMIT 1");
     query.addBindValue(phone);
     

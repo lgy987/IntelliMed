@@ -80,7 +80,7 @@ void Server::onReadyRead() {
         if (!doc.isObject()) continue;
 
         QJsonObject request = doc.object();
-
+        qDebug().noquote() << QJsonDocument(request).toJson(QJsonDocument::Indented);
         QString action = request["action"].toString();
         if (action == "sendMessage") {
             int partnerId = request["partner_id"].toInt();
@@ -154,6 +154,10 @@ QJsonObject Server::handleAction(QTcpSocket* client, const QJsonObject &request)
         return handleSendMessage(request);
     } else if (action == "doctoradvice") {
         return forwardDoctorAdviceRequest(request);
+    } else if (action == "healthassess") {
+        return forwardHealthAssessRequest(request);
+    } else if (action == "case_operation") {
+        return forwardCaseRequest(request);
     } else {
         QJsonObject reply;
         reply["action"] = "";
@@ -168,7 +172,8 @@ QJsonObject Server::handleLogin(QTcpSocket *client, const QJsonObject &request) 
     QString username = request["username"].toString();
     QString password = request["password"].toString();
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT * FROM users WHERE username = :username AND password = :password");
     query.bindValue(":username", username);
     query.bindValue(":password", password);
@@ -189,7 +194,8 @@ QJsonObject Server::handleLogin(QTcpSocket *client, const QJsonObject &request) 
 int Server::checkToken(const QString &token) {
     if (token.isEmpty()) return -1;
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT id FROM users WHERE token = :token AND token_expiry > :now");
     query.bindValue(":token", token);
     query.bindValue(":now", QDateTime::currentSecsSinceEpoch());
@@ -210,7 +216,8 @@ QJsonObject Server::handleTokenLogin(QTcpSocket *client, const QJsonObject &requ
 
     if (userId > 0) {
         // Token valid, renew session
-        QSqlQuery query;
+        QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+        QSqlQuery query(usersDb);
         query.prepare("SELECT username FROM users WHERE id = :id");
         query.bindValue(":id", userId);
         QString username;
@@ -237,7 +244,8 @@ QJsonObject Server::handleSignUp(const QJsonObject &request) {
         reply["status"] = "error";
         reply["message"] = "所有字段均为必填项";
     } else {
-        QSqlQuery insertQuery;
+        QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+        QSqlQuery insertQuery(usersDb);
         insertQuery.prepare("INSERT INTO users (username, password, email) "
                             "VALUES (:username, :password, :email)");
         insertQuery.bindValue(":username", username);
@@ -277,7 +285,8 @@ QJsonObject Server::createSessionForUser(const int &userId, const QString &usern
     qint64 expiry = now + duration;
 
     // Update database
-    QSqlQuery update;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery update(usersDb);
     update.prepare("UPDATE users SET token = :token, token_expiry = :expiry WHERE id = :id");
     update.bindValue(":token", token);
     update.bindValue(":expiry", static_cast<qint64>(expiry));
@@ -303,7 +312,8 @@ QJsonObject Server::handleDoctorLogin(QTcpSocket *client, const QJsonObject &req
     QString username = request["username"].toString();
     QString password = request["password"].toString();
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT * FROM doctors WHERE username = :username AND password = :password");
     query.bindValue(":username", username);
     query.bindValue(":password", password);
@@ -324,7 +334,8 @@ QJsonObject Server::handleDoctorLogin(QTcpSocket *client, const QJsonObject &req
 int Server::checkDoctorToken(const QString &token) {
     if (token.isEmpty()) return -1;
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT id FROM doctors WHERE token = :token AND token_expiry > :now");
     query.bindValue(":token", token);
     query.bindValue(":now", QDateTime::currentSecsSinceEpoch());
@@ -345,7 +356,8 @@ QJsonObject Server::handleDoctorTokenLogin(QTcpSocket *client, const QJsonObject
 
     if (userId > 0) {
         // Token valid, renew session
-        QSqlQuery query;
+        QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+        QSqlQuery query(usersDb);
         query.prepare("SELECT username FROM doctors WHERE id = :id");
         query.bindValue(":id", userId);
         QString username;
@@ -371,7 +383,8 @@ QJsonObject Server::handleDoctorSignUp(const QJsonObject &request) {
         reply["status"] = "error";
         reply["message"] = "所有字段均为必填项";
     } else {
-        QSqlQuery insertQuery;
+        QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+        QSqlQuery insertQuery(usersDb);
         insertQuery.prepare("INSERT INTO doctors (username, password, email) "
                             "VALUES (:username, :password, :email)");
         insertQuery.bindValue(":username", username);
@@ -411,7 +424,8 @@ QJsonObject Server::createSessionForDoctor(const int &userId, const QString &use
     qint64 expiry = now + duration;
 
     // Update database
-    QSqlQuery update;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery update(usersDb);
     update.prepare("UPDATE doctors SET token = :token, token_expiry = :expiry WHERE id = :id");
     update.bindValue(":token", token);
     update.bindValue(":expiry", static_cast<qint64>(expiry));
@@ -443,7 +457,8 @@ QJsonObject Server::handleGetPersonalInfo(const QJsonObject &request) {
         return reply;
     }
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     // LEFT JOIN to make sure we still get username/email even if no personal_info row exists yet
     query.prepare(R"(
         SELECT u.username, u.email,
@@ -490,7 +505,8 @@ QJsonObject Server::handleUpdatePersonalInfo(const QJsonObject &request) {
     QString idNumber = request["id_number"].toString().trimmed();
     QString phone = request["phone_number"].toString().trimmed();
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     // Use INSERT with ON CONFLICT(id) DO UPDATE for upsert
     query.prepare("INSERT INTO personal_info (id, name, id_number, phone_number) "
                   "VALUES (:id, :name, :id_number, :phone_number) "
@@ -526,7 +542,8 @@ QJsonObject Server::handleDoctorGetPersonalInfo(const QJsonObject &request) {
         return reply;
     }
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     // LEFT JOIN to make sure we still get username/email even if no personal_info row exists yet
     query.prepare(R"(
         SELECT u.username, u.email,
@@ -576,7 +593,8 @@ QJsonObject Server::handleDoctorUpdatePersonalInfo(const QJsonObject &request) {
     QString title = request["title"].toString().trimmed();
     QString description = request["description"].toString().trimmed();
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     // Use INSERT with ON CONFLICT(id) DO UPDATE for upsert
     query.prepare("INSERT INTO doctor_personal_info (id, name, department, title, description) "
                   "VALUES (:id, :name, :department, :title, :description) "
@@ -615,7 +633,8 @@ QJsonObject Server::handleGetSessionInfo(const QJsonObject &request) {
         return reply;
     }
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare(R"(
     SELECT s.id AS sessionId, s.time,
            s.patientId AS patientId,
@@ -685,7 +704,8 @@ QJsonObject Server::handleDoctorGetSessionInfo(const QJsonObject &request) {
         return reply;
     }
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare(R"(
         SELECT s.id AS sessionId, s.time,
                s.patientId AS patientId,
@@ -763,7 +783,8 @@ QJsonObject Server::handleEndSession(const QJsonObject &request) {
         return reply;
     }
 
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
 
     // Step 3: Check session exists and belongs to doctor
     query.prepare("SELECT * FROM session WHERE id = :sessionId AND doctorId = :doctorId");
@@ -780,7 +801,7 @@ QJsonObject Server::handleEndSession(const QJsonObject &request) {
     int patientId = query.value("patientId").toInt();
     QString time = query.value("time").toString();
 
-    QSqlQuery insertQuery;
+    QSqlQuery insertQuery(usersDb);
     insertQuery.prepare("INSERT INTO session_old (id, patientId, doctorId, time) VALUES (:id, :patientId, :doctorId, :time)");
     insertQuery.bindValue(":id", sessionId);  // keep same id
     insertQuery.bindValue(":patientId", patientId);
@@ -838,7 +859,8 @@ QJsonObject Server::handleGetMessages(const QJsonObject &request) {
     }
 
     // Step 2: Query messages
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT sender_type, message, timestamp "
                   "FROM messages "
                   "WHERE doctor_id = :doctorId AND patient_id = :patientId "
@@ -905,7 +927,8 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
     int recipientDoctorId  = (senderType == "patient") ? partnerId : -1;
 
     // Save message to DB
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
                   "VALUES (:doctorId, :patientId, :senderType, :message)");
     query.bindValue(":doctorId", senderDoctorId > 0 ? senderDoctorId : recipientDoctorId);
@@ -943,7 +966,8 @@ QJsonObject Server::handleSendMessage(const QJsonObject &request) {
 }
 
 QString Server::getPatientToken(int id) {
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("SELECT token FROM users WHERE id = :id");
     query.bindValue(":id", id);
 
@@ -967,6 +991,7 @@ QString Server::getDoctorToken(int id) {
 }
 
 void Server::handleAISendMessage(QTcpSocket *client, const QJsonObject &request) {
+    qDebug().noquote() << QJsonDocument(request).toJson(QJsonDocument::Indented);
     QJsonObject reply;
     QString token = request["token"].toString();
     QString messageText = request["message"].toString();
@@ -999,7 +1024,8 @@ void Server::handleAISendMessage(QTcpSocket *client, const QJsonObject &request)
     }
 
     // Save message to DB
-    QSqlQuery query;
+    QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+    QSqlQuery query(usersDb);
     query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
                   "VALUES (:doctorId, :patientId, :senderType, :message)");
     query.bindValue(":doctorId", 0);
@@ -1021,6 +1047,7 @@ void Server::handleAISendMessage(QTcpSocket *client, const QJsonObject &request)
     reply["message"] = messageText;
     reply["partner_id"] = 0;
     sendResponse(client, reply);
+    qDebug().noquote() << QJsonDocument(reply).toJson(QJsonDocument::Indented);
 
     callAI(client, senderPatientId, messageText);
 
@@ -1086,7 +1113,8 @@ void Server::callAI(QTcpSocket *client, int senderPatientId, const QString &user
         }
 
         // Save AI message to DB
-        QSqlQuery query;
+        QSqlDatabase usersDb = QSqlDatabase::database("usersConnection");
+        QSqlQuery query(usersDb);
         query.prepare("INSERT INTO messages (doctor_id, patient_id, sender_type, message) "
                       "VALUES (:doctorId, :patientId, :senderType, :message)");
         query.bindValue(":doctorId", 0);
@@ -1119,4 +1147,24 @@ QJsonObject Server::forwardDoctorAdviceRequest(const QJsonObject &actionRequest)
     wrapper["action"] = "doctoradvice";
     wrapper["content"] = response;
     return wrapper;
+}
+
+QJsonObject Server::forwardHealthAssessRequest(const QJsonObject &actionRequest) {
+    // unwrap request
+    QJsonObject request = actionRequest.value("content").toObject();
+    qDebug().noquote() << QJsonDocument(request).toJson(QJsonDocument::Indented);
+
+    // call HealthAssessServer
+    QJsonObject response = healthAssessServer.handleRequest(request);
+
+    // wrap reply
+    QJsonObject wrapper;
+    wrapper["action"] = "healthassess";
+    wrapper["content"] = response;
+    return wrapper;
+}
+
+QJsonObject Server::forwardCaseRequest(const QJsonObject &actionRequest) {
+
+    return caseServer.handleRequest(actionRequest);
 }

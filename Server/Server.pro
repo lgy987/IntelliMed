@@ -5,6 +5,10 @@ CONFIG += c++11 cmdline
 SOURCES += \
         dadb.cpp \
         doctoradviceserver.cpp \
+        hadb.cpp \
+        healthassessserver.cpp \
+        CaseDatabase.cpp \
+        CaseServer.cpp \
         main.cpp \
         server.cpp
 
@@ -16,4 +20,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     dadb.h \
     doctoradviceserver.h \
+    hadb.h \
+    healthassessserver.h \
+    CaseDatabase.h \
+    CaseServer.h \
     server.h

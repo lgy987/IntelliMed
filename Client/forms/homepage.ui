@@ -43,7 +43,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnCases">
+       <widget class="QPushButton" name="btnMessage">
         <property name="text">
          <string>💬 线上对话</string>
         </property>
@@ -60,6 +60,20 @@
        <widget class="QPushButton" name="btnHealth">
         <property name="text">
          <string>💊 医嘱管理</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPrevious">
+        <property name="text">
+         <string>❤️ 健康评估</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCases">
+        <property name="text">
+         <string>💊 病例管理</string>
         </property>
        </widget>
       </item>

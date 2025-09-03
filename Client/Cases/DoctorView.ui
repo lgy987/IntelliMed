@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DoctorView</class>
+ <widget class="QWidget" name="DoctorView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget#DoctorView {
+    background-color: #06b6d4;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+QLabel {
+    color: white;
+    font-weight: bold;
+}
+
+QLineEdit {
+    background-color: white;
+    border: 2px solid #0e7490;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 14px;
+}
+
+QLineEdit:focus {
+    border-color: #0891b2;
+}
+
+QPushButton {
+    background-color: #0e7490;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+QPushButton:hover {
+    background-color: #0891b2;
+}
+
+QPushButton:pressed {
+    background-color: #155e75;
+}
+
+QTableView {
+    background-color: white;
+    border: 2px solid #0e7490;
+    border-radius: 8px;
+    alternate-background-color: #f0f9ff;
+}
+
+QTableView::item {
+    padding: 8px;
+}
+
+QHeaderView::section {
+    background-color: #0e7490;
+    color: white;
+    padding: 8px;
+    border: none;
+    font-weight: bold;
+}
+
+QLabel#statusLabel {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 8px;
+}</string>
+  </property>
+  <property name="windowTitle">
+   <string>医生视图</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>15</number>
+   </property>
+   <property name="leftMargin">
+    <number>15</number>
+   </property>
+   <property name="topMargin">
+    <number>15</number>
+   </property>
+   <property name="rightMargin">
+    <number>15</number>
+   </property>
+   <property name="bottomMargin">
+    <number>15</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="searchWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>病毒名称:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignVCenter|Qt::AlignRight</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="virusEdit">
+        <property name="placeholderText">
+         <string>请输入病毒名称...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="searchButton">
+        <property name="text">
+         <string>搜索</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="text">
+      <string>就绪</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

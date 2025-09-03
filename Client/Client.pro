@@ -13,7 +13,9 @@ INCLUDEPATH += include \
                include/doctor \
                include/patient \
                include/network \
-               include/doctoradvice
+               include/doctoradvice \
+               include/HealthAssess \
+               include/Cases
 
 
 # Source files
@@ -38,6 +40,14 @@ SOURCES += \
     DoctorAdvice/medlink.cpp \
     DoctorAdvice/orderdetaildialog.cpp \
     DoctorAdvice/ui_theme.cpp \
+    HealthAssess/NetClient.cpp \
+    HealthAssess/HealthAssess.cpp \
+    HealthAssess/DataViewer.cpp \
+    Cases/CaseNetworkManager.cpp \
+    Cases/PatientView.cpp \
+    Cases/DoctorView.cpp \
+    Cases/CaseEditDialog.cpp
+
 
 # Headers
 HEADERS += \
@@ -49,7 +59,6 @@ HEADERS += \
     include/doctor/doctorsessionform.h \
     include/patient/homepage.h \
     include/patient/loginform.h \
-    include/patient/moodrecorder.h \
     include/patient/personalinfoform.h \
     include/patient/session.h \
     include/patient/sessionform.h \
@@ -61,6 +70,13 @@ HEADERS += \
     DoctorAdvice/medlink.h \
     DoctorAdvice/orderdetaildialog.h \
     DoctorAdvice/ui_theme.h \
+    HealthAssess/HealthAssess.h \
+    HealthAssess/NetClient.h \
+    HealthAssess/DataViewer.h \
+    Cases/CaseNetworkManager.h \
+    Cases/PatientView.h \
+    Cases/DoctorView.h \
+    Cases/CaseEditDialog.h
 
 # Forms
 FORMS += \
@@ -74,7 +90,11 @@ FORMS += \
     forms/signupform.ui \
     forms/sessionform.ui \
     forms/doctorsessionform.ui \
-    forms/message.ui
+    forms/message.ui \
+    HealthAssess/HealthAssess.ui \
+    Cases/PatientView.ui \
+    Cases/DoctorView.ui \
+    Cases/CaseEditDialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

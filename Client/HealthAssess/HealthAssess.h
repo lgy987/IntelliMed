@@ -5,9 +5,9 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QPushButton>
-#include "DatabaseManager.h"
+//#include "DatabaseManager.h"
 #include "DataViewer.h"
-
+#include "NetClient.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class HealthAssess; }
 QT_END_NAMESPACE
@@ -30,9 +30,11 @@ private:
     QString collectSelectedOptions();
     double BMI;
     int score=0;
-    
-    // 新增成员
-    DatabaseManager *m_dbManager;
+    NetClient m_client;
+    void setupNetwork();
+
+
+  //  DatabaseManager *m_dbManager;
     DataViewer *m_dataViewer;
     
     void setupDatabase();

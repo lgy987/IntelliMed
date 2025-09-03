@@ -32,6 +32,8 @@ private:
     void setupSessionForm();
     void setupMessage();
     void setupDoctorAdvice();
+    void setupHealthAssess();
+    void setupCases();
 };
 
 #endif // HOMEPAGE_H

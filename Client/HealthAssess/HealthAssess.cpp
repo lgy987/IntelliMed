@@ -1,17 +1,15 @@
 #include "HealthAssess.h"
 #include <QRegularExpression>
 #include "ui_HealthAssess.h"
-
+#include<QMessageBox>
 HealthAssess::HealthAssess(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::HealthAssess)
-    , m_dbManager(nullptr)
     , m_dataViewer(nullptr)
 {
     ui->setupUi(this);
     setWindowTitle("健康自测问卷");
-    
-    setupDatabase();
+
     setupUI();
 }
 
@@ -157,95 +155,63 @@ QString HealthAssess::collectSelectedOptions()
 
 void HealthAssess::on_pushButton_clicked()
 {
-    if(!HealthAssess::validateInput()) return;
+    if (!HealthAssess::validateInput()) return;
 
     QString lifestyleChoices = collectSelectedOptions();
 
-    QString name = ui->lineEdit_name->text().trimmed();
-    int age = ui->lineEdit_age->text().toInt();
+    QString name   = ui->lineEdit_name->text().trimmed();
+    int age        = ui->lineEdit_age->text().toInt();
     QString gender = ui->lineEdit_gender->text().trimmed();
-    double height = ui->lineEdit_height->text().toDouble();
-    double weight = ui->lineEdit_weight->text().toDouble();
-    QString phone = ui->lineEdit_phonenum->text().trimmed();
+    double height  = ui->lineEdit_height->text().toDouble();
+    double weight  = ui->lineEdit_weight->text().toDouble();
+    QString phone  = ui->lineEdit_phonenum->text().trimmed();
 
-    double bmiValue = weight * 10000 / height / height;
-
+    double bmiValue = weight * 10000.0 / height / height;
     QString bmiStatus;
-    if (bmiValue <= 18.4) bmiStatus = "偏瘦";
-    else if (bmiValue < 24) bmiStatus = "正常";
-    else if (bmiValue < 28) bmiStatus = "偏胖";
-    else if (bmiValue < 32) bmiStatus = "肥胖";
-    else bmiStatus = "重度肥胖";
+    if (bmiValue <= 18.4)      bmiStatus = "偏瘦";
+    else if (bmiValue < 24.0)  bmiStatus = "正常";
+    else if (bmiValue < 28.0)  bmiStatus = "偏胖";
+    else if (bmiValue < 32.0)  bmiStatus = "肥胖";
+    else                       bmiStatus = "严重肥胖";
 
-    // 保存到数据库
-    bool saveSuccess = false;
-    if (m_dbManager && m_dbManager->isConnected()) {
-        saveSuccess = m_dbManager->insertPatientData(
-            name, age, gender, height, weight, phone,
-            bmiValue, bmiStatus, lifestyleChoices, score
-        );
-    }
+    // 你的 score 计算逻辑应该已经在类里
+    // 如果 score 是成员/或从 UI 勾选中计算，这里直接用
+    int scoreVal = score;
 
-    QString result = QString("提交成功！\n\n"
-                            "姓名: %1\n"
-                            "年龄: %2\n"
-                            "性别: %3\n"
-                            "身高: %4 cm\n"
-                            "体重: %5 kg\n"
-                            "手机号: %6\n"
-                            "BMI指数: %7 (%8)\n"
-                            "生活方式选择: %9\n"
-                            "健康评分: %10\n\n"
-                            "数据保存状态: %11")
-                        .arg(name).arg(age).arg(gender)
-                        .arg(height).arg(weight).arg(phone)
-                        .arg(QString::number(bmiValue, 'f', 1))
-                        .arg(bmiStatus)
-                        .arg(lifestyleChoices)
-                        .arg(score)
-                        .arg(saveSuccess ? "已保存到数据库" : "保存失败");
+    QJsonObject payload{
+        {"name", name},
+        {"age", age},
+        {"gender", gender},
+        {"height", height},
+        {"weight", weight},
+        {"phone", phone},
+        {"bmi", bmiValue},
+        {"bmi_status", bmiStatus},
+        {"lifestyle_choices", lifestyleChoices},
+        {"health_score", scoreVal}
+    };
 
-    QMessageBox::information(this, "提交成功", result);
+    NetClient& client = NetClient::instance();
+    connect(&client, &NetClient::patientInserted, this,
+            [this, name, age, gender, height, weight, phone, bmiValue, bmiStatus, lifestyleChoices, scoreVal](bool ok){
+                QString result = QString("提交成功！\n\n"
+                                         "姓名: %1\n年龄: %2\n性别: %3\n身高: %4 cm\n体重: %5 kg\n手机号: %6\n"
+                                         "BMI指数: %7 (%8)\n生活方式选择: %9\n健康评分: %10\n\n数据保存状态: %11")
+                                     .arg(name).arg(age).arg(gender)
+                                     .arg(height).arg(weight).arg(phone)
+                                     .arg(QString::number(bmiValue, 'f', 1)).arg(bmiStatus)
+                                     .arg(lifestyleChoices).arg(scoreVal)
+                                     .arg(ok ? "已保存到后端数据库" : "保存失败");
 
-    // 清空表单
-    ui->lineEdit_name->clear();
-    ui->lineEdit_age->clear();
-    ui->lineEdit_gender->clear();
-    ui->lineEdit_height->clear();
-    ui->lineEdit_weight->clear();
-    ui->lineEdit_phonenum->clear();
-    
-    // 取消所有复选框
-    ui->checkBox_regdiet->setChecked(false);
-    ui->checkBox_baldiet->setChecked(false);
-    ui->checkBox_regexe->setChecked(false);
-    ui->checkBox_enoslp->setChecked(false);
-    ui->checkBox_smodrk->setChecked(false);
-    ui->checkBox_strdep->setChecked(false);
-    ui->checkBox_chrdis->setChecked(false);
+                QMessageBox::information(this, "提交结果", result);
 
-    qDebug() << "===== 问卷数据 =====";
-    qDebug() << "姓名:" << name;
-    qDebug() << "年龄:" << age;
-    qDebug() << "性别:" << gender;
-    qDebug() << "身高:" << height;
-    qDebug() << "体重:" << weight;
-    qDebug() << "手机号:" << phone;
-    qDebug() << "BMI指数:" << bmiValue << "(" << bmiStatus << ")";
-    qDebug() << "生活方式选择:" << lifestyleChoices;
-    qDebug() << "健康评分:" << score;
-    qDebug() << "数据库保存:" << (saveSuccess ? "成功" : "失败");
-    qDebug() << "====================";
+                // 清空表单/重置状态逻辑
+                // ...
+            });
+    client.insertPatient(payload);
 }
 
-// 新增的数据库设置函数
-void HealthAssess::setupDatabase()
-{
-    m_dbManager = new DatabaseManager(this);
-    if (!m_dbManager->initializeDatabase()) {
-        QMessageBox::warning(this, "数据库错误", "数据库初始化失败，数据将无法保存");
-    }
-}
+
 
 // 新增的UI设置函数
 void HealthAssess::setupUI()
@@ -258,7 +224,7 @@ void HealthAssess::setupUI()
 void HealthAssess::on_viewDataButton_clicked()
 {
     if (!m_dataViewer) {
-        m_dataViewer = new DataViewer(m_dbManager);
+        m_dataViewer = new DataViewer(&NetClient::instance());
     }
     
     m_dataViewer->show();

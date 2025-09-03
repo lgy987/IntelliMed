@@ -6,6 +6,8 @@
 #include <QJsonDocument>
 
 #include "doctoradviceserver.h"
+#include "healthassessserver.h"
+#include "CaseServer.h"
 
 class Server : public QTcpServer {
     Q_OBJECT
@@ -60,4 +62,10 @@ private:
     //DoctorAdvice
     DoctorAdviceServer doctorAdviceServer;
     QJsonObject forwardDoctorAdviceRequest(const QJsonObject &actionRequest);
+
+    HealthAssessServer healthAssessServer;
+    QJsonObject forwardHealthAssessRequest(const QJsonObject &actionRequest);
+
+    CaseServer caseServer;
+    QJsonObject forwardCaseRequest(const QJsonObject &actionRequest);
 };

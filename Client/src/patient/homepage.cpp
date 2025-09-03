@@ -6,6 +6,8 @@
 #include "session.h"
 #include "../DoctorAdvice/patientwindow.h"
 #include "../DoctorAdvice/medlink.h"
+#include "../HealthAssess/HealthAssess.h"
+#include "../Cases/PatientView.h"
 #include <QLabel>
 
 
@@ -74,6 +76,8 @@ HomePage::HomePage(QWidget *loginForm, QWidget *parent)
     setupMessage();
     setupAI();
     setupDoctorAdvice();
+    setupHealthAssess();
+    setupCases();
     QVBoxLayout* sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
@@ -150,6 +154,39 @@ void HomePage::setupDoctorAdvice()
     layout->addWidget(pw);
 }
 
+void HomePage::setupHealthAssess()
+{
+    HealthAssess *ha = new HealthAssess(this);
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(5));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(ha);
+}
+
+void HomePage::setupCases()
+{
+    QStackedWidget* stacked = ui->stackedPages;
+
+    // Ensure page at index 6 exists
+    QWidget* page = nullptr;
+    if (stacked->count() > 6) {
+        page = stacked->widget(6);
+    } else {
+        page = new QWidget();
+        stacked->insertWidget(6, page);
+    }
+
+    // Give it a layout if it doesn't have one
+    QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(page->layout());
+    if (!layout) {
+        layout = new QVBoxLayout(page);
+        layout->setContentsMargins(0,0,0,0);
+    }
+
+    // Add PatientView
+    PatientView* pv = new PatientView(page);
+    layout->addWidget(pv);
+}
+
 void HomePage::setupButtons()
 {
     // Set all buttons initially as inactive (gray / transparent)
@@ -180,8 +217,8 @@ void HomePage::setupButtons()
         }
     )";
 
-    buttons = { ui->btnUser, ui->btnAppointment, ui->btnCases,
-               ui->btnOrders, ui->btnHealth};
+    buttons = { ui->btnUser, ui->btnAppointment, ui->btnMessage,
+               ui->btnOrders, ui->btnHealth, ui->btnPrevious, ui->btnCases};
 
     for (int i = 0; i < buttons.size(); ++i) {
         QPushButton* btn = buttons[i];

@@ -2,6 +2,8 @@
 #include "session.h"
 #include "doctorsession.h"
 #include "../DoctorAdvice/medlink.h"
+#include "../HealthAssess/NetClient.h"
+#include "../Cases/CaseNetworkManager.h"
 #include <QJsonDocument>
 #include <QDebug>
 
@@ -271,6 +273,13 @@ void NetworkManager::onReadyRead()
                 QJsonObject content = obj.value("content").toObject();
                 MedLink::instance().onReadyRead(content);
             }
+        } else if (action == "healthassess") {
+            if (obj.value("content").isObject()) {
+                QJsonObject content = obj.value("content").toObject();
+                NetClient::instance().onReadyRead(content);
+            }
+        } else if (action == "case_operation") {
+            CaseNetworkManager::instance().onReadyRead(obj);
         }
     }
 }

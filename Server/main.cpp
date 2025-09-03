@@ -6,8 +6,8 @@
 #include <QDebug>
 
 bool initDatabase() {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("users.db"); // file will be created in app directory
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "usersConnection");
+    db.setDatabaseName("users.db");
 
     if (!db.open()) {
         qCritical() << "Failed to open database!";

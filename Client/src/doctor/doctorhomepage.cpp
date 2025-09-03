@@ -4,6 +4,8 @@
 #include "doctorpersonalinfoform.h"
 #include "doctorsession.h"
 #include "../DoctorAdvice/doctorwindow.h"
+#include "../HealthAssess/HealthAssess.h"
+#include "../Cases/DoctorView.h"
 
 DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     : QMainWindow(parent)
@@ -69,13 +71,15 @@ DoctorHomePage::DoctorHomePage(QWidget *dloginForm, QWidget *parent)
     setupSessionForm();
     setupMessage();
     setupDoctorAdvice();
+    setupHealthAssess();
+    setupCases();
     QVBoxLayout *sidebarLayout = ui->verticalLayout_sidebar;
     if (sidebarLayout) {
         sidebarLayout->setContentsMargins(0, 0, 0, 0); // remove margins
         sidebarLayout->setSpacing(4);                 // spacing between buttons
     }
 
-    connect(ui->btnLogout, &QPushButton::clicked, this, &DoctorHomePage::handleLogout);
+    connect(btnLogout, &QPushButton::clicked, this, &DoctorHomePage::handleLogout);
 }
 
 DoctorHomePage::~DoctorHomePage()
@@ -136,6 +140,39 @@ void DoctorHomePage::setupDoctorAdvice()
     layout->addWidget(pw);
 }
 
+void DoctorHomePage::setupHealthAssess()
+{
+    HealthAssess *ha = new HealthAssess(this);
+    QVBoxLayout* layout = new QVBoxLayout(ui->stackedPages->widget(3));
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(ha);
+}
+
+void DoctorHomePage::setupCases()
+{
+    QStackedWidget* stacked = ui->stackedPages;
+
+    // Ensure page at index 5 exists
+    QWidget* page = nullptr;
+    if (stacked->count() > 5) {
+        page = stacked->widget(5);
+    } else {
+        page = new QWidget();
+        stacked->insertWidget(5, page);
+    }
+
+    // Give it a layout if it doesn't have one
+    QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(page->layout());
+    if (!layout) {
+        layout = new QVBoxLayout(page);
+        layout->setContentsMargins(0,0,0,0);
+    }
+
+    // Add PatientView
+    DoctorView* pv = new DoctorView(page);
+    layout->addWidget(pv);
+}
+
 void DoctorHomePage::setupButtons()
 {
     // Set all buttons initially as inactive (gray / transparent)
@@ -166,8 +203,8 @@ void DoctorHomePage::setupButtons()
         }
     )";
 
-    buttons = { ui->btnUser, ui->btnAppointment, ui->btnCases,
-               ui->btnOrders, ui->btnHealth, ui->btnLogout };
+    buttons = { ui->btnUser, ui->btnAppointment, ui->btnMessage,
+               ui->btnOrders, ui->btnHealth, ui->btnCases};
 
     for (int i = 0; i < buttons.size(); ++i) {
         QPushButton* btn = buttons[i];

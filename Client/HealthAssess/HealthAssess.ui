@@ -228,7 +228,7 @@
       </font>
      </property>
      <property name="text">
-      <string>用于医生端查看患者数据</string>
+      <string>医生端查看患者数据调试用</string>
      </property>
     </widget>
    </item>

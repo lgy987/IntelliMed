@@ -10,27 +10,32 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QHeaderView>
-#include "DatabaseManager.h"
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
+#include <QDateTime>
+#include <QStandardPaths>
+#include "NetClient.h"
 
 class DataViewer : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit DataViewer(DatabaseManager *dbManager, QWidget *parent = nullptr);
+    explicit DataViewer(NetClient* client, QWidget *parent = nullptr);
 
 private slots:
-    void refreshData();
+    void loadData();
     void searchData();
     void exportData();
     void clearSearch();
 
 private:
     void setupUI();
-    void loadData();
     void setupTable();
-    
-    DatabaseManager *m_dbManager;
+    void handleAllPatients(const QJsonArray &arr);
+
+    NetClient* m_client;             // 改为网络客户端
     QTableWidget *m_tableWidget;
     QLineEdit *m_searchLineEdit;
     QComboBox *m_searchFieldCombo;
